@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build and packaged extension output
+dist/
+extension-release/
+*.zip
+*.crx
+*.pem
+
+# Vite
+.vite/
+vite.config.js.timestamp-*.mjs
+
+# Tests and reports
+coverage/
+
+# Environment and logs
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local assistant metadata and scratch files
+.agents/
+.claude/
+skills-lock.json
+*.fixed
+
