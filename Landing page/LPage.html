@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GptGate | اکستنشن فارسی‌ساز و اصلاح فرمول هوش مصنوعی</title>
+  <style>
+    :root {
+      --color-primary: #2FCCE1;
+      --color-primary-dim: rgba(47, 204, 225, 0.55);
+      --color-primary-glow: rgba(47, 204, 225, 0.2);
+      --color-primary-subtle: rgba(47, 204, 225, 0.08);
+      --color-bg-deep: #020202;
+      --color-bg-surface: rgba(18, 20, 24, 0.75);
+      --color-text-primary: #f3f4f6;
+      --color-text-secondary: #9ca3af;
+      --color-text-muted: #6b7280;
+      --color-border-accent: rgba(47, 204, 225, 0.2);
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 99px;
+      --font-stack: "IRANSansX", "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--color-bg-deep);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      background-image: radial-gradient(circle at top center, rgba(47, 204, 225, 0.12) 0%, transparent 65%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 40px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-primary);
+    }
+    .brand span { color: var(--color-text-primary); }
+
+    /* ── Hero Section ── */
+    .hero {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--color-primary-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border-accent);
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.35;
+      max-width: 700px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #2FCCE1, #a5f3fc);
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      max-width: 580px;
+    }
+
+    /* ── Comparison Cards ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--color-bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      padding: 20px;
+      border-radius: var(--radius-md);
+    }
+    .feature-card h3 {
+      font-size: 15px;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Purchase Grid (Dual Channels) ── */
+    .purchase-section {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      .purchase-section { grid-template-columns: 1fr; }
+    }
+
+    .glass-box {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border-accent);
+      backdrop-filter: blur(24px);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .box-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .box-sub {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* ── Form Styles ── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      font-family: inherit;
+      color: #fff;
+      font-size: 13px;
+      direction: ltr;
+      text-align: right;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+    .input-hint {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: #020202;
+      box-shadow: 0 4px 20px var(--color-primary-dim);
+      margin-top: 10px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--color-primary-dim);
+    }
+    .btn-telegram {
+      background: #229ED9;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(34, 158, 217, 0.35);
+    }
+    .btn-telegram:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(34, 158, 217, 0.5);
+    }
+
+    /* ── Telegram Channel Perks ── */
+    .perks-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0 24px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .perks-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .perks-list li::before {
+      content: "✓";
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        ⚡ <span>GptGate</span>
+      </div>
+      <span class="badge">سازگار با ChatGPT ،Gemini و Claude</span>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>تجربه بی‌نقص چت هوش مصنوعی؛ <span>فارسی، راست‌چین و بدون باگ</span></h1>
+      <p class="hero-desc">
+        حل همیشگی مشکل چپ‌چین بودن متن، اعمال فونت خوانای ایران‌سنس و جلوگیری از به‌هم‌ریختگی فرمول‌های ریاضی و کدهای انگلیسی.
+      </p>
+    </section>
+
+    <!-- Features -->
+    <section class="features-grid">
+      <div class="feature-card">
+        <h3>✨ تنظیم خودکار جهت (RTL)</h3>
+        <p>تشخیص هوشمند زبان و راست‌چین‌سازی خودکار متن پاسخ‌ها و کادر تایپ شما.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📐 اصلاح فرمول‌های ریاضی</h3>
+        <p>حفظ ساختار صحیح و چپ‌چین فرمول‌های KaTeX و MathJax بدون برعکس شدن پرانتزها.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔤 فونت چشم‌نواز فارسی</h3>
+        <p>جایگزینی فونت‌های پیش‌فرض با تایپ‌فیس بهینه‌شده و استاندارد فارسی.</p>
+      </div>
+    </section>
+
+    <!-- Purchase Grid -->
+    <section class="purchase-section" id="purchase">
+      
+      <!-- Option 1: Direct Site Purchase -->
+      <div class="glass-box">
+        <div>
+          <div class="box-title">خرید آنلاین و فعال‌سازی آنی</div>
+          <div class="box-sub">لایسنس + عضویت خودکار در کانال VIP خریداران</div>
+
+          <form id="orderForm" onsubmit="handlePayment(event)">
+            <div class="form-group">
+              <label for="phone">شماره موبایل</label>
+              <input type="tel" id="phone" placeholder="09123456789" required />
+            </div>
+
+            <div class="form-group">
+              <label for="telegramId">آیدی تلگرام شما (بدون @)</label>
+              <input type="text" id="telegramId" placeholder="YourUsername" required />
+              <span class="input-hint">برای افزودن شما به کانال آپدیت‌ها و پشتیبانی</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              پرداخت و دریافت آنی فایل
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Option 2: Telegram Purchase -->
+      <div class="glass-box" style="border-color: rgba(34, 158, 217, 0.3);">
+        <div>
+          <div class="box-title">خرید از طریق تلگرام</div>
+          <div class="box-sub">کارت به کارت و ارتباط مستقیم با ادمین</div>
+          
+          <ul class="perks-list">
+            <li>عضویت دستی در کانال خریداران</li>
+            <li>پاسخ به سوالات قبل از خرید</li>
+            <li>امکان پرداخت کارت‌به‌کارت</li>
+          </ul>
+        </div>
+
+        <a href="https://t.me/gptgateshopbot" target="_blank" class="btn btn-telegram">
+          خرید از بات تلگرام
+        </a>
+      </div>
+
+    </section>
+  </div>
+
+  <script>
+    function handlePayment(e) {
+      e.preventDefault();
+        
+      const phone = encodeURIComponent(document.getElementById('phone').value);
+      const telegramId = encodeURIComponent(document.getElementById('telegramId').value);
+        
+      // هدایت کاربر به سایت با ارسال پارامترها
+      window.location.href = `https://gptgate.ai/shop/checkout?phone=${phone}&telegram=${telegramId}`;
+    }
+    
+  </script>
+</body>
+</html>
