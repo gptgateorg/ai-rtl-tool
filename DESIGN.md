@@ -55,3 +55,19 @@ Tests cover light/dark, 320/390px, target sizes, real 500 font loading, actual
 transition endpoints and interruption, reduced motion, forced colors, persistence
 and failure recovery. tests/motion.cjs is the compact-control contract.
 See docs/live-chrome-validation.md for current live-site and performance evidence.
+
+## ChatGPT PDF control
+
+One 44px header trigger uses the same 13px/500 UI scale and a 16px stroke icon.
+The menu is at most 304px wide, with 12px viewport clearance, 12px corners, a
+one-pixel border and no decorative shadow. Two actions name their scope:
+whole conversation or select a response. The supplied mark and the approved
+love attribution form a muted 12px/400 footer below the options, keeping the
+native 52px header clear. The standalone floating badge is removed on ChatGPT.
+
+Selection uses a temporary nonmodal popover, an answer outline, Previous/Next,
+explicit Export and Cancel. Native links, copy buttons, text selection and the
+composer remain usable. Recycled or removed answer identities require reselection.
+Escape restores focus; keyboard and reduced-motion entry are immediate, pointer
+entry is 150ms opacity/4px translation. Listeners exist only while the menu or
+picker is open. There are no persistent controls under answers or new timers.

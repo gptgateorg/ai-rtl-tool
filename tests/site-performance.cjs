@@ -2,7 +2,7 @@ const fs=require('node:fs');const path=require('node:path');const os=require('no
 const {chromium,root,output}=require('./harness.cjs');
 const median=values=>[...values].sort((a,b)=>a-b)[Math.floor(values.length/2)];
 async function measure(baseline){
- const dist=path.join(root,baseline?'artifacts/baseline-dist':'dist');assert.ok(fs.existsSync(path.join(dist,'manifest.json')),'Build baseline first');
+ const dist=path.join(root,baseline?(process.env.GPTGATE_PERF_BASELINE||'artifacts/baseline-dist'):'dist');assert.ok(fs.existsSync(path.join(dist,'manifest.json')),'Build baseline first');
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'gptgate-perf-'));
  const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,args:[`--disable-extensions-except=${dist}`,`--load-extension=${dist}`],viewport:{width:1000,height:800}});
  try{
@@ -22,7 +22,7 @@ async function measure(baseline){
   // loaded FontFaces instead of interpreting an empty timing list as success.
   const fonts=await page.evaluate(()=>[...document.fonts].filter(f=>f.status==='loaded').map(f=>({family:f.family,weight:f.weight})));
   if(!baseline){
-   assert.equal(tools,21);
+   assert.equal(tools,1);
    assert.ok(fonts.some(f=>f.family==='GPTGate IranSans'&&f.weight==='500'),'Selected conversation face did not load');
    assert.ok(fonts.some(f=>f.family==='GPTGateUI'),'PDF controls UI face did not load');
    assert.ok(!fonts.some(f=>/Shabnam|Vazirmatn|Sahel/.test(f.family)),'Unused font family loaded');

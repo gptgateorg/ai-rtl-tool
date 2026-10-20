@@ -70,8 +70,9 @@ The popup interface continues to use its Windows fonts. See
 
 ## Save ChatGPT content as PDF
 
-1. On ChatGPT, choose the conversation PDF action near the conversation or the
-   PDF action appended to an assistant response.
+1. Open the PDF menu in the ChatGPT conversation header. Choose the whole
+   conversation, or Select response: click an answer (or use Previous/Next),
+   then choose Export selected response. Escape or Cancel exits selection.
 2. For a conversation, allow the temporary top-to-bottom collection to finish.
    Use Cancel, or scroll/touch/use a navigation key to stop it.
 3. Inspect the extension preview: check the message count, beginning/end,

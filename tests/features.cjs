@@ -117,7 +117,7 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#settings').getAttr
   const site=sites[0];
   await site.waitForSelector('gptgate-export-tools[data-gptgate-export="conversation"]');
   assert.ok(await site.evaluate(async()=>{const faces=await document.fonts.load('12px GPTGateUI');return faces.length===1 && faces[0].status==='loaded';}));checks++;
-  assert.equal(await site.locator('gptgate-export-tools').count(),2);checks++;
+  assert.equal(await site.locator('gptgate-export-tools').count(),1);checks++;
   const popup=await context.newPage();await popup.setViewportSize({width:390,height:600});await popup.goto(`chrome-extension://${id}/popup.html`);await ready(popup);await popup.locator('summary').click();
   for(const [family,computed] of [['iransans','IranSans'],['vazirmatn','Vazirmatn'],['shabnam','Shabnam'],['sahel','Sahel']]){
    await popup.selectOption('#fontFamily',family);await popup.selectOption('#fontWeight','700');await saved(popup);
@@ -139,9 +139,12 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#settings').getAttr
   await popup.locator('#themeToggle').click();await popup.waitForTimeout(450);await popup.screenshot({path:path.join(output,'fonts-dark.png'),fullPage:true});
   await popup.setViewportSize({width:320,height:600});await popup.screenshot({path:path.join(output,'fonts-320.png'),fullPage:true});
   await site.evaluate(()=>{document.querySelector('#persian').append(' متن تازه');document.querySelector('main').append(document.createElement('div'));});
-  await site.waitForTimeout(400);assert.equal(await site.locator('gptgate-export-tools').count(),2);checks++;
+  await site.waitForTimeout(400);assert.equal(await site.locator('gptgate-export-tools').count(),1);checks++;
   let opened=context.waitForEvent('page');
-  await site.getByRole('button',{name:'PDF این پاسخ',exact:true}).click();
+  await site.getByRole('button',{name:'خروجی PDF',exact:true}).click();
+  await site.locator('[data-action=select]').click();
+  await site.locator('#persian').click();
+  await site.getByRole('button',{name:'خروجی پاسخ انتخاب‌شده',exact:true}).click();
   let preview=await opened;await preview.waitForFunction(()=>!document.querySelector('#print')?.disabled);
   assert.equal(await preview.locator('.message').count(),1);assert.ok((await preview.locator('#messages').textContent()).includes('متن تازه'));
   assert.equal(await preview.locator('math mfrac').count(),1);assert.ok(!(await preview.locator('#messages').textContent()).includes('visual duplicate'));checks+=4;
@@ -149,18 +152,19 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#settings').getAttr
   await preview.emulateMedia({media:'print'});assert.equal(await preview.locator('details').getAttribute('open'),'');assert.ok((await preview.locator('details').innerText()).includes('جزئیات'));checks++;
   await preview.pdf({path:path.join(output,'response-fa.pdf'),format:'A4',printBackground:true});await preview.emulateMedia({media:'screen'});
   await preview.evaluate(()=>{window.print=()=>window.printCalled=true;});await preview.locator('#print').click();assert.equal(await preview.evaluate(()=>window.printCalled),true);checks++;
-  opened=context.waitForEvent('page');await site.getByRole('button',{name:'خروجی PDF گفتگو',exact:true}).click();
+  opened=context.waitForEvent('page');await site.getByRole('button',{name:'خروجی PDF',exact:true}).click();await site.locator('[data-action=all]').click();
   preview=await opened;await preview.waitForFunction(()=>!document.querySelector('#print')?.disabled);
   assert.equal(await preview.locator('.message').count(),2);assert.equal(await preview.locator('.role').first().textContent(),'شما');
   await preview.screenshot({path:path.join(output,'pdf-conversation.png'),fullPage:true});
   await preview.pdf({path:path.join(output,'conversation-fa.pdf'),format:'A4',printBackground:true});checks+=2;
   await site.evaluate(()=>{history.pushState({},'', '/c/other');document.querySelector('main').innerHTML='<article data-message-author-role="assistant" data-message-id="new"><p>گفتگوی جدید</p></article>';});
-  await site.waitForSelector('gptgate-export-tools[data-gptgate-export="response"]');assert.equal(await site.locator('gptgate-export-tools').count(),2);checks++;
+  await site.waitForSelector('gptgate-export-tools[data-gptgate-export="conversation"]');assert.equal(await site.locator('gptgate-export-tools').count(),1);checks++;
   await site.screenshot({path:path.join(output,'pdf-site-controls.png'),fullPage:true});
   await site.evaluate(()=>{document.querySelector('article').dataset.messageAuthorRole='user';document.querySelector('article p').firstChild.data='Reused user node';});
   await site.waitForFunction(()=>document.querySelectorAll('gptgate-export-tools[data-gptgate-export="response"]').length===0);
   await site.evaluate(()=>{document.querySelector('article').dataset.messageAuthorRole='assistant';document.querySelector('article p').firstChild.data='Reused assistant node';});
-  await site.waitForSelector('gptgate-export-tools[data-gptgate-export="response"]');checks+=2;
+  await site.getByRole('button',{name:'خروجی PDF',exact:true}).click();await site.locator('[data-action=select]').click();await site.locator('article p').click();
+  assert.equal(await site.locator('[data-gptgate-pdf-selected]').count(),1);await site.keyboard.press('Escape');checks+=2;
   // Session payloads from non-ChatGPT origins must be rejected.
   const rejected=await worker.evaluate(async()=>{
    const tabs=await chrome.tabs.query({url:'https://gemini.google.com/*'});

@@ -13,12 +13,12 @@ const fixture=`<main><aside><div data-markdown-text-style="assistant-message">Ac
   cdp.on('Runtime.exceptionThrown',e=>errors.push(e.exceptionDetails.exception?.description||e.exceptionDetails.text));
   cdp.on('Runtime.consoleAPICalled',e=>{if(e.type==='error')errors.push(e.args.map(a=>a.value||a.description).join(' '));});
   await cdp.send('Runtime.enable');await page.goto('https://chatgpt.com/c/live-structure');
-  await page.waitForFunction(()=>document.querySelectorAll('gptgate-export-tools').length===3);
+  await page.waitForFunction(()=>document.querySelectorAll('gptgate-export-tools').length===1);
   const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');await worker.evaluate(()=>chrome.storage.sync.set({responseDir:'auto',composerDir:'auto'}));
   await page.waitForFunction(()=>document.querySelector('#live').dir==='ltr');
   // Real ChatGPT hydration can replace body after the content script initializes.
   await page.evaluate(html=>{const body=document.createElement('body');body.innerHTML=html;document.body.replaceWith(body);},fixture);
-  await page.waitForFunction(()=>document.body.classList.contains('gptgate-use-font')&&document.querySelectorAll('gptgate-export-tools').length===3);
+  await page.waitForFunction(()=>document.body.classList.contains('gptgate-use-font')&&document.querySelectorAll('gptgate-export-tools').length===1);
   await page.evaluate(()=>document.body.className='host-theme');
   await page.waitForFunction(()=>document.body.classList.contains('gptgate-use-font'));
   assert.ok(await page.locator('#live').evaluate(e=>getComputedStyle(e).fontFamily.includes('GPTGate IranSans')));
@@ -40,10 +40,10 @@ const fixture=`<main><aside><div data-markdown-text-style="assistant-message">Ac
   await page.waitForFunction(()=>document.querySelector('pre').dir==='rtl');
   const scans=await cdp.send('Runtime.evaluate',{contextId:world.id,expression:'window.oldScans',returnByValue:true});assert.equal(scans.result.value,0,'Stream rescanned an unchanged earlier response');
   await page.evaluate(()=>document.querySelector('#stream').innerHTML='<p>پاسخ جایگزین</p>');
-  await page.waitForFunction(()=>document.querySelector('#stream > gptgate-export-tools'));
+  await page.waitForFunction(()=>document.querySelector('#stream p').dir==='rtl');assert.equal(await page.locator('#stream gptgate-export-tools').count(),0);
   // Native role changes, visibility and new DIL response roots remain discoverable.
   await page.evaluate(()=>{document.querySelector('#stream').hidden=true;const el=document.createElement('div');el.id='new';el.setAttribute('data-chatgpt-selection-message-id','assistant-3');el.setAttribute('data-markdown-text-style','assistant-message');el.innerHTML='<p>پاسخ تازه</p>';document.querySelector('main').append(el);});
-  await page.waitForFunction(()=>document.querySelector('#new gptgate-export-tools')&&document.querySelector('#new p').dir==='rtl');
+  await page.waitForFunction(()=>document.querySelector('#new p').dir==='rtl');
   await page.evaluate(()=>document.querySelector('#stream').hidden=false);
   await page.waitForTimeout(300);assert.equal(await page.locator('gptgate-export-tools[data-gptgate-export="conversation"]').count(),1);
   const capture=await cdp.send('Runtime.evaluate',{contextId:world.id,expression:`(async()=>{const m=await import(chrome.runtime.getURL('src/shared/export-content.js'));return m.messageElements().map(e=>({role:m.captureMessage(e).role,html:m.captureMessage(e).html}))})()`,awaitPromise:true,returnByValue:true});

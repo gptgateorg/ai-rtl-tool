@@ -1,3 +1,5 @@
+> The PDF interaction below records the earlier per-response design. The current header-menu implementation and its validation are in [pdf-controls-validation.md](pdf-controls-validation.md).
+
 # Installed Chrome validation and compact refinement
 
 ## Changes

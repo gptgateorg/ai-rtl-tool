@@ -35,7 +35,8 @@ controls without knowing RTL/LTR terminology.
 Windows settings supply the brand and sun/moon artwork. The user-approved
 compact refinement supersedes their exact geometry: 13px/500 labels, a 4px
 spacing scale, understated borders and 150ms pointer feedback. The popup uses the supplied Persian wordmark; the
-floating control uses the supplied standalone mark. Asset provenance is recorded
+ChatGPT PDF menu carries a small love attribution and the standalone mark.
+Gemini/Claude keep their existing floating control. Asset provenance is recorded
 in fonts/README.md and images/README.md. The popup interface keeps its Windows
 Regular/Medium faces; conversation font choices are a separate user preference.
 

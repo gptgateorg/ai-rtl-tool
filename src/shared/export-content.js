@@ -110,6 +110,14 @@ export function messageElements(root = document) {
   });
 }
 
+export function messageIdentity(element) {
+  return element.getAttribute('data-message-id')
+    || element.closest('[data-chatgpt-selection-message-id]')?.getAttribute('data-chatgpt-selection-message-id')
+    || element.closest('[data-chatgpt-search-message-ids]')?.getAttribute('data-chatgpt-search-message-ids')
+    || element.querySelector('[data-dil-message-id]')?.getAttribute('data-dil-message-id')
+    || element.closest('[data-testid^="conversation-turn-"]')?.getAttribute('data-testid');
+}
+
 export function findScrollContainer(element) {
   for (let parent=element?.parentElement;parent;parent=parent.parentElement) {
     if (/(auto|scroll)/.test(getComputedStyle(parent).overflowY) && parent.scrollHeight>parent.clientHeight+2) return parent;
@@ -138,11 +146,7 @@ export async function collectConversation({signal, progress = ()=>{}, maxMs = 20
   const snapshot = () => {
     for (const element of messageElements()) {
       if (!check()) { limited = true; break; }
-      const stable = element.getAttribute('data-message-id')
-        || element.closest('[data-chatgpt-selection-message-id]')?.getAttribute('data-chatgpt-selection-message-id')
-        || element.closest('[data-chatgpt-search-message-ids]')?.getAttribute('data-chatgpt-search-message-ids')
-        || element.querySelector('[data-dil-message-id]')?.getAttribute('data-dil-message-id')
-        || element.closest('[data-testid^="conversation-turn-"]')?.getAttribute('data-testid');
+      const stable = messageIdentity(element);
       if (!stable) unstableIdentity = true;
       if (!nodeKeys.has(element)) nodeKeys.set(element,`node-${++nextKey}`);
       const key = `${messageRole(element)}:${stable || nodeKeys.get(element)}`;

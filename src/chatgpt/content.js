@@ -1,7 +1,7 @@
 (async () => {
   try {
     if (window.__gptgate_chatgpt_engine) return;
-    const { syncExportUI } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
+    const { syncExportUI, EXPORT_HEADER_SELECTOR } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
     const { MESSAGE_SELECTOR } = await import(chrome.runtime.getURL('src/shared/export-content.js'));
     const selectors = await import(chrome.runtime.getURL('src/chatgpt/selectors.js'));
     const { SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS } = selectors;
@@ -396,7 +396,7 @@
           for (const node of m.addedNodes) if (node.nodeType === Node.ELEMENT_NODE) queueContent(node, true);
           // Only changes to message structure need to rediscover PDF controls.
           if (changed.some(node => node.nodeType === Node.ELEMENT_NODE &&
-            (node.matches(`${MESSAGE_SELECTOR}, main`) || node.querySelector(MESSAGE_SELECTOR)))) exportSyncNeeded = true;
+            (node.matches(`${MESSAGE_SELECTOR}, main, ${EXPORT_HEADER_SELECTOR}`) || node.querySelector(`${MESSAGE_SELECTOR}, ${EXPORT_HEADER_SELECTOR}`)))) exportSyncNeeded = true;
         }
       }
       if (dirtyResponses.size || dirtyCode.size || composersNeeded || exportSyncNeeded) scheduleFlush();
