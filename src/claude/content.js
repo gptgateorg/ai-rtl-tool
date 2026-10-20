@@ -276,6 +276,13 @@
           --background-color-page: #020202 !important;
           --bg-100: 0 0% 0.7843% !important;
         }
+        /* Nested Claude theme roots reset canvas tokens. Leave their page
+           aliases intact: popovers/composers can map those to raised surfaces. */
+        html.gptgate-claude-dark-surface:is([data-mode="dark"], .dark):not([data-mode="light"])
+          .cds-root:not([data-mode="light"], [data-mode="light"] *) {
+          --cds-surface-1: #020202 !important;
+          --bg-100: 0 0% 0.7843% !important;
+        }
       `;
       style.textContent = `
         ${claudeSurfaceCSS}

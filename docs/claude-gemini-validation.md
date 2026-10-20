@@ -207,3 +207,30 @@ Validation:
 
 Evidence: `artifacts/qa/claude-appearance-live.json`,
 `claude-appearance-suite.log`, `claude-appearance-final-checks.log`.
+
+### Correction: visible canvas inside nested Claude theme roots
+
+The first appearance check above measured the body background, not the visible
+`main.dframe-content` canvas. Claude's nested `.cds-root` elements reset the
+surface tokens, so the body changed while the visible conversation stayed gray.
+That earlier check did not establish that the black option worked visually.
+
+The scoped canvas-token override now also reaches nested theme roots, excluding
+light-mode subtrees. It preserves their local page aliases so raised composer
+and popover surfaces keep their native colors. This is CSS only, with no new
+observers or timers.
+
+The updated nested-root regression failed on the previous build and passed
+after the fix. Build and both site-engine suites passed, including unchanged
+composer geometry, raised popovers, light subtrees, native light mode and
+immediate restoration when the option is off. Idle document-query counts
+remained zero.
+
+In real Chrome, the visible main canvas changed from RGB 21/21/21 to 2/2/2.
+The composer stayed RGB 32/32/31, 768 × 48 px with a 14 px radius; its buttons
+also stayed unchanged. Off restored the visible canvas, and the option was
+left **on**, matching the owner's setting at the start of this correction.
+The reloaded build passed without the temporary diagnostic style.
+
+Evidence: `artifacts/qa/claude-canvas-before-fix-test.log`,
+`claude-canvas-fix-tests.log`, and `claude-canvas-live.json`.
