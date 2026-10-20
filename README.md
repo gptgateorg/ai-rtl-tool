@@ -114,3 +114,33 @@ Bug reports, suggestions, and pull requests are welcome. If a supported website 
 ## Community
 
 News and updates are available on the [GptGate Telegram channel](https://t.me/GptGateAI).
+
+## Popup design and validation
+
+The popup uses the Windows client's Mint/Deep Ink controls, IRANSansX assets and
+CSS motion. It has no account or login. Its sun/moon control changes only the
+popup appearance; the existing Claude surface preference remains separate.
+
+The existing engine always fixes math when either direction is forced RTL.
+The popup shows that effective state and explains why its math switch is then
+disabled. The stored math preference is retained for automatic/LTR modes.
+
+Settings continue to use `chrome.storage.sync` (Chrome can sync preferences if
+browser sync is enabled). No GptGate account or server is involved.
+
+```bash
+npm ci
+npx playwright install chromium
+npm test
+npm run test:performance
+```
+
+Tests use temporary browser profiles and isolated website fixtures, never a
+personal account. `npm test` builds the extension, checks scope integrity,
+exercises UI/storage/errors, compares motion with Windows, and loads the real
+Manifest V3 build on three synthetic supported origins. Performance tests compare
+against original commit `244006e` and write measurements under `artifacts/qa/`.
+These fixtures do not certify compatibility with every current live website.
+
+Load the generated `dist` folder with Chrome's **Load unpacked** action.
+See `docs/popup-validation.md` for the measured scope and results.

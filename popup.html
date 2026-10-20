@@ -1,653 +1,80 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-motion="instant">
   <head>
     <meta charset="utf-8" />
-    <title>GptGate</title>
-    <style>
-      @font-face {
-        font-family: 'IRANSansX';
-        src: url('fonts/IRANSansX-MediumD4.woff2') format('woff2');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
-
-      /* ── Design Tokens (U9) ── */
-      :root {
-        --color-primary: #2FCCE1;
-        --color-primary-dim: rgba(47, 204, 225, 0.55);
-        --color-primary-glow: rgba(47, 204, 225, 0.2);
-        --color-primary-subtle: rgba(47, 204, 225, 0.12);
-        --color-primary-border: rgba(47, 204, 225, 0.3);
-        --color-bg-deep: #020202;
-        --color-bg-darker: #000000;
-        --color-bg-graphite: #0c0c0c;
-        --color-bg-surface: rgba(12, 12, 12, 0.75);
-        --color-bg-surface-dim: rgba(2, 2, 2, 0.65);
-        --color-text-primary: #f3f4f6;
-        --color-text-secondary: #9ca3af;
-        --color-text-muted: #6b7280;
-        --color-text-faint: rgba(243, 244, 246, 0.7);
-        --color-border-subtle: rgba(255, 255, 255, 0.05);
-        --color-border-light: rgba(255, 255, 255, 0.08);
-        --color-border-accent: rgba(47, 204, 225, 0.15);
-        --color-dot-ok: #2FCCE1;
-        --color-dot-warn: #fb923c;
-        --color-dot-error: #ef4444;
-        --radius-sm: 8px;
-        --radius-md: 11px;
-        --radius-lg: 14px;
-        --radius-pill: 99px;
-        --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-spring: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        --font-stack: "IRANSansX", "Segoe UI", "Vazirmatn", "Inter", Tahoma, sans-serif;
-      }
-
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      html, body {
-        width: 360px;
-        min-width: 320px;
-        max-width: 400px;
-        height: auto;
-        min-height: auto;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        overflow-y: auto;           /* U2: allow scroll if content overflows */
-        box-sizing: border-box;
-        text-rendering: optimizeLegibility;
-      }
-
-      body {
-        font-family: var(--font-stack);
-        font-size: 13px;
-        color: var(--color-text-primary);
-        direction: rtl;
-        position: relative;
-        background: var(--color-bg-deep);
-      }
-
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(47, 204, 225, 0.25); border-radius: var(--radius-md); }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(47, 204, 225, 0.45); }
-
-
-
-      /* ── Glass card ── */
-      .glass {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        height: auto;
-        border-radius: 0;
-        background: linear-gradient(160deg, var(--color-bg-surface) 0%, var(--color-bg-surface-dim) 100%);
-        backdrop-filter: blur(32px) saturate(180%);
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--color-border-light);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      }
-
-
-
-      /* ── Header ── */
-      .popup-header {
-        padding: 16px 18px 14px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border-bottom: 1px solid var(--color-border-accent);
-      }
-
-      .logo-box {
-        width: 44px;
-        height: 44px;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        flex-shrink: 0;
-        transition: transform var(--transition-spring), box-shadow var(--transition-spring);
-      }
-      .logo-box:hover {
-        transform: scale(1.05) rotate(2deg);
-        box-shadow: 0 0 24px var(--color-primary-dim);
-      }
-      .logo-box img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: screen; }
-
-      .header-title { font-size: 15px; font-weight: 700; color: var(--color-text-primary); letter-spacing: 0.2px; }
-      .header-sub   { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
-
-      /* U4: badge with entrance animation */
-      .badge {
-        margin-right: auto;
-        font-size: 10px;
-        font-weight: 600;
-        padding: 3px 9px;
-        border-radius: var(--radius-pill);
-        background: var(--color-primary-subtle);
-        color: var(--color-primary);
-        border: 1px solid var(--color-primary-border);
-        letter-spacing: 0.3px;
-        display: none;
-        opacity: 0;
-        transform: scale(0.8);
-        transition: opacity 0.3s ease, transform 0.3s var(--transition-spring);
-      }
-      .badge.visible {
-        display: block;
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      /* ── Body ── */
-      .popup-body {
-        padding: 16px 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .section-label {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        color: var(--color-primary-dim);
-        margin-bottom: 10px;
-      }
-
-      .setting-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .row-label    { font-size: 13px; font-weight: 600; color: var(--color-text-primary); }
-      .row-sublabel { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
-
-      /* ── Segmented control ── */
-      .seg {
-        position: relative;
-        display: flex;
-        gap: 4px;
-        background: rgba(0, 0, 0, 0.45);
-        border-radius: var(--radius-md);
-        padding: 3px;
-        border: 1px solid var(--color-border-light);
-        flex-shrink: 0;
-        isolation: isolate;
-        overflow: hidden;
-      }
-
-      .seg-indicator {
-        position: absolute;
-        top: 3px;
-        bottom: 3px;
-        left: 3px;
-        width: var(--seg-indicator-width, 0px);
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--color-primary-dim);
-        background: linear-gradient(135deg, var(--color-primary-glow), rgba(47, 204, 225, 0.08));
-        box-shadow: 0 0 14px var(--color-primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        transform: translate3d(var(--seg-indicator-x, 0px), 0, 0) scaleX(1) scaleY(1);
-        transform-origin: center;
-        transition:
-          transform 420ms cubic-bezier(0.22, 1.35, 0.36, 1),
-          width 420ms cubic-bezier(0.22, 1.35, 0.36, 1),
-          opacity 180ms ease;
-        opacity: 0;
-        z-index: 0;
-        pointer-events: none;
-      }
-
-      .seg.is-bubbling .seg-indicator {
-        animation: seg-bubble-motion 440ms cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes seg-bubble-motion {
-        0% {
-          transform: translate3d(var(--seg-indicator-x), 0, 0) scaleX(0.92) scaleY(1.08);
-        }
-        38% {
-          transform: translate3d(var(--seg-indicator-x), 0, 0) scaleX(1.12) scaleY(0.9);
-        }
-        70% {
-          transform: translate3d(var(--seg-indicator-x), 0, 0) scaleX(0.97) scaleY(1.04);
-        }
-        100% {
-          transform: translate3d(var(--seg-indicator-x), 0, 0) scaleX(1) scaleY(1);
-        }
-      }
-
-      .seg-btn {
-        position: relative;
-        z-index: 1;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 11px;
-        border-radius: var(--radius-sm);
-        border: 1px solid transparent;
-        cursor: pointer;
-        background: transparent;
-        color: var(--color-text-faint);
-        transition:
-          color 220ms ease,
-          transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
-          background-color 220ms ease;
-        line-height: 1;
-        font-family: inherit;
-        letter-spacing: 0.2px;
-      }
-
-      /* Hover and click animations */
-      .seg-btn:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--color-text-primary);
-      }
-
-      .seg-btn:active {
-        transform: scale(0.94);
-      }
-
-      .seg-btn.active {
-        background: transparent;
-        color: var(--color-primary);
-        border-color: transparent;
-        box-shadow: none;
-        transform: scale(1.02);
-      }
-
-      .seg.has-active .seg-indicator {
-        opacity: 1;
-      }
-
-      /* U3: Focus styles for accessibility */
-      .seg-btn:focus-visible {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(47, 204, 225, 0.15);
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .seg-indicator,
-        .seg-btn,
-        .switch-thumb {
-          animation: none !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-
-      .divider {
-        border: none;
-        border-top: 1px solid var(--color-border-subtle);
-      }
-
-      /* ── Toggle switch (U5: RTL-corrected, A11y fixed) ── */
-      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
-      .switch-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer; }
-
-      .switch-label-sm { font-size: 11px; color: var(--color-text-muted); }
-
-      .switch-track {
-        width: 42px;
-        height: 24px;
-        border-radius: 999px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
-          rgba(0, 0, 0, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        transition:
-          background .25s ease,
-          border-color .25s ease,
-          box-shadow .25s ease,
-          transform .25s cubic-bezier(0.16, 1, 0.3, 1);
-        flex-shrink: 0;
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.05),
-          inset 0 -8px 14px rgba(0, 0, 0, 0.24);
-      }
-
-      .switch-wrap:hover .switch-track {
-        border-color: rgba(255, 255, 255, 0.2);
-        background: rgba(0, 0, 0, 0.55);
-        transform: translateY(-1px);
-      }
-
-      input[type="checkbox"]:checked + .switch-track {
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0)),
-          linear-gradient(135deg, rgba(47, 204, 225, 0.7), rgba(2, 200, 140, 0.5));
-        border-color: rgba(47, 204, 225, 0.6);
-        box-shadow:
-          0 0 16px rgba(47, 204, 225, 0.35),
-          inset 0 1px 0 rgba(255, 255, 255, 0.22),
-          inset 0 -8px 14px rgba(16, 142, 190, 0.16);
-      }
-
-      input[type="checkbox"]:focus-visible + .switch-track {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(47, 204, 225, 0.15);
-      }
-
-      .switch-thumb {
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        right: auto;
-        width: 18px;
-        height: 18px;
-        border-radius: 999px;
-        background:
-          radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.86) 45%, rgba(225, 232, 240, 0.96));
-        box-shadow:
-          0 2px 7px rgba(0, 0, 0, 0.42),
-          inset 0 1px 0 rgba(255, 255, 255, 0.88);
-        transition: transform .34s cubic-bezier(0.22, 1.28, 0.36, 1);
-      }
-
-      input[type="checkbox"]:checked + .switch-track .switch-thumb { transform: translateX(18px); }
-
-      .switch-track.is-bubbling .switch-thumb {
-        animation: switch-bubble-off 430ms cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      input[type="checkbox"]:checked + .switch-track.is-bubbling .switch-thumb {
-        animation-name: switch-bubble-on;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .switch-track.is-bubbling .switch-thumb {
-          animation: none !important;
-        }
-      }
-
-      @keyframes switch-bubble-on {
-        0%   { transform: translateX(18px) scaleX(0.9) scaleY(1.1); }
-        38%  { transform: translateX(18px) scaleX(1.16) scaleY(0.88); }
-        72%  { transform: translateX(18px) scaleX(0.96) scaleY(1.04); }
-        100% { transform: translateX(18px) scaleX(1) scaleY(1); }
-      }
-
-      @keyframes switch-bubble-off {
-        0%   { transform: translateX(0) scaleX(0.9) scaleY(1.1); }
-        38%  { transform: translateX(0) scaleX(1.16) scaleY(0.88); }
-        72%  { transform: translateX(0) scaleX(0.96) scaleY(1.04); }
-        100% { transform: translateX(0) scaleX(1) scaleY(1); }
-      }
-
-      /* ── Collapsible "advanced settings" section ── */
-      .section-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        font-family: inherit;
-        color: inherit;
-      }
-      .section-toggle .section-label { margin-bottom: 0; transition: color var(--transition-fast); }
-      .section-toggle:hover .section-label { color: var(--color-primary); }
-      .section-toggle:focus-visible {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-        border-radius: 4px;
-      }
-
-      .section-chevron {
-        width: 14px;
-        height: 14px;
-        color: var(--color-text-muted);
-        flex-shrink: 0;
-        transition: transform var(--transition-fast), color var(--transition-fast);
-      }
-      .section-toggle[aria-expanded="true"] .section-chevron {
-        transform: rotate(180deg);
-        color: var(--color-primary-dim);
-      }
-
-      .collapsible {
-        display: grid;
-        grid-template-rows: 0fr;
-        transition: grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .collapsible.expanded { grid-template-rows: 1fr; }
-      .collapsible-inner { overflow: hidden; min-height: 0; }
-
-      @media (prefers-reduced-motion: reduce) {
-        .collapsible { transition: none !important; }
-      }
-
-      /* ── Footer ── */
-      .footer {
-        padding: 12px 18px 16px;
-        border-top: 1px solid var(--color-border-accent);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .cta-btn {
-        width: 100%;
-        padding: 10px 16px;
-        border-radius: var(--radius-lg);
-        border: 1px solid rgba(47, 204, 225, 0.4);
-        background: rgba(1, 12, 15, 0.96);
-        color: var(--color-text-primary);
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-family: inherit;
-        letter-spacing: 0.2px;
-        transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
-        box-shadow: 0 0 0 rgba(47, 204, 225, 0);
-      }
-
-      .cta-btn:hover {
-        transform: translateY(-2px);
-        border-color: rgba(47, 204, 225, 0.65);
-        background: rgba(2, 18, 22, 0.98);
-        box-shadow: 0 8px 24px rgba(47, 204, 225, 0.25);
-      }
-
-      .cta-btn:active {
-        transform: translateY(0) scale(0.98);
-      }
-
-      /* U3: Focus style for CTA */
-      .cta-btn:focus-visible {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(47, 204, 225, 0.15);
-      }
-
-      .cta-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--color-primary); transition: transform 0.3s var(--transition-spring); }
-      .cta-btn:hover .cta-icon { transform: rotate(10deg) scale(1.1); }
-
-      .status-row { display: flex; align-items: center; gap: 7px; }
-
-      .status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: rgba(176,190,197,0.4);
-        flex-shrink: 0;
-        transition: background .3s, box-shadow .3s;
-      }
-      .status-dot.ok    { background: var(--color-dot-ok);    box-shadow: 0 0 8px rgba(47, 204, 225, 0.6); }
-      .status-dot.warn  { background: var(--color-dot-warn);  box-shadow: 0 0 8px rgba(251, 146, 60, 0.5); }
-      .status-dot.error { background: var(--color-dot-error); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
-
-      /* U6: Loading pulse animation */
-      @keyframes pulse-dot {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-      }
-      .status-dot.loading {
-        background: var(--color-primary);
-        animation: pulse-dot 1.2s ease-in-out infinite;
-      }
-
-      .status-text { font-size: 11px; color: var(--color-text-faint); }
-
-      /* Version text */
-      .footer-meta {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .version-text {
-        font-size: 10px;
-        color: rgba(243, 244, 246, 0.3);
-        letter-spacing: 0.5px;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ابزار فارسی GptGate</title>
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <div class="glass">
-
-      <header class="popup-header">
-        <div class="logo-box">
-          <img src="images/logo.png" alt="GptGate" />
-        </div>
-        <div>
-          <div class="header-title">GptGate</div>
-          <div class="header-sub">ابزار اصلاح متن فارسی هوش مصنوعی</div>
-        </div>
-        <span class="badge" id="connBadge">فعال</span>
-      </header>
-
-      <div class="popup-body">
-
-        <div>
-          <div class="section-label">جهت‌دهی متن</div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-
-            <div class="setting-row">
-              <div>
-                <div class="row-label">پاسخ‌ها</div>
-                <div class="row-sublabel">جهت پاسخ‌های هوش مصنوعی</div>
-              </div>
-              <div class="seg" role="group" aria-label="جهت پاسخ‌ها">
-                <button class="seg-btn" id="respRtl"  data-key="responseDir" data-val="rtl"  title="راست‌چین – مناسب متن فارسی">RTL</button>
-                <button class="seg-btn" id="respLtr"  data-key="responseDir" data-val="ltr"  title="چپ‌چین – مناسب متن انگلیسی">LTR</button>
-                <button class="seg-btn" id="respAuto" data-key="responseDir" data-val="auto" title="تشخیص خودکار جهت هر پاراگراف">خودکار</button>
-              </div>
-            </div>
-
-            <hr class="divider" />
-
-            <div class="setting-row">
-              <div>
-                <div class="row-label">کادر نوشتن</div>
-                <div class="row-sublabel">جهت متن ورودی شما</div>
-              </div>
-              <div class="seg" role="group" aria-label="جهت کادر نوشتن">
-                <button class="seg-btn" id="compRtl"  data-key="composerDir" data-val="rtl"  title="راست‌چین">RTL</button>
-                <button class="seg-btn" id="compLtr"  data-key="composerDir" data-val="ltr"  title="چپ‌چین">LTR</button>
-                <button class="seg-btn" id="compAuto" data-key="composerDir" data-val="auto" title="تشخیص خودکار">خودکار</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div>
-          <button type="button" class="section-toggle" id="advancedToggle" aria-expanded="false" aria-controls="advancedPanel">
-            <span class="section-label">تنظیمات افزونه</span>
-            <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <div class="collapsible" id="advancedPanel">
-            <div class="collapsible-inner">
-              <div style="display:flex;flex-direction:column;gap:12px;padding-top:12px">
-
-                <div class="setting-row">
-                  <div>
-                    <div class="row-label">اصلاح فرمول ریاضی</div>
-                    <div class="row-sublabel">پشتیبانی از <bdi>KaTeX</bdi> و <bdi>MathJax</bdi></div>
-                  </div>
-                  <label class="switch-wrap" for="mathSwitch">
-                    <span class="switch-label-sm" id="mathLabel">خاموش</span>
-                    <input type="checkbox" id="mathSwitch" class="sr-only" aria-label="اصلاح فرمول ریاضی" />
-                    <div class="switch-track">
-                      <div class="switch-thumb"></div>
-                    </div>
-                  </label>
-                </div>
-
-                <hr class="divider" />
-
-                <div class="setting-row">
-                  <div>
-                    <div class="row-label">فونت ایران‌سنس</div>
-                    <div class="row-sublabel">اعمال فونت ایران‌سنس روی متون راست‌چین</div>
-                  </div>
-                  <label class="switch-wrap" for="fontSwitch">
-                    <span class="switch-label-sm" id="fontLabel">خاموش</span>
-                    <input type="checkbox" id="fontSwitch" class="sr-only" aria-label="فونت ایران‌سنس" />
-                    <div class="switch-track">
-                      <div class="switch-thumb"></div>
-                    </div>
-                  </label>
-                </div>
-
-                <hr class="divider" id="claudeThemeDivider" style="display:none" />
-
-                <div class="setting-row" id="claudeThemeRow" style="display:none">
-                  <div>
-                    <div class="row-label">تم تیره Claude</div>
-                    <div class="row-sublabel">تغییر پس‌زمینه Claude به مشکی</div>
-                  </div>
-                  <label class="switch-wrap" for="claudeThemeSwitch">
-                    <span class="switch-label-sm" id="claudeThemeLabel">خاموش</span>
-                    <input type="checkbox" id="claudeThemeSwitch" class="sr-only" aria-label="تم تیره Claude" />
-                    <div class="switch-track">
-                      <div class="switch-thumb"></div>
-                    </div>
-                  </label>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
+    <header class="popup-header">
+      <div class="brand">
+        <img src="images/logo.png" width="40" height="40" alt="" />
+        <div><h1><bdi>GptGate</bdi></h1><p>برای متن فارسی و انگلیسی</p></div>
       </div>
-
-      <footer class="footer">
-        <button id="ctaBtn" class="cta-btn" aria-label="تلگرام GptGate"><!-- U8 -->
-          <svg class="cta-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-          </svg>
-          <bdi>GptGate</bdi>
+      <div class="theme-switcher" data-motion="instant">
+        <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="نمای تیرهٔ افزونه" title="نمای تیرهٔ افزونه">
+          <span class="theme-toggle-thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <defs><mask id="theme-moon-mask"><rect width="24" height="24" fill="white"/><circle class="theme-moon-cutout" cx="16" cy="9" r="7" fill="black"/></mask></defs>
+              <circle class="theme-sun-disc" cx="12" cy="12" r="7" fill="currentColor" mask="url(#theme-moon-mask)"/>
+              <g class="theme-sun-rays" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v2M12 21v2M1 12h2M21 12h2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></g>
+            </svg>
+          </span>
         </button>
-        <div class="footer-meta">
-          <div class="status-row">
-            <div class="status-dot" id="statusDot"></div>
-            <span class="status-text" id="status">در انتظار ارتباط…</span>
+      </div>
+    </header>
+    <main>
+      <fieldset id="settings" disabled aria-busy="true">
+        <legend class="sr-only">تنظیمات متن فارسی</legend>
+        <section class="panel direction-panel" aria-labelledby="directionHeading">
+          <h2 id="directionHeading" class="sr-only">جهت متن</h2>
+          <div class="direction-setting">
+            <div class="setting-heading"><h3 id="responseLabel">پاسخ‌های هوش مصنوعی</h3></div>
+            <div class="seg" role="group" aria-labelledby="responseLabel" data-motion="instant">
+              <button type="button" class="seg-btn" id="respLtr" data-key="responseDir" data-val="ltr" title="چپ‌چین، مناسب متن انگلیسی" aria-pressed="false">چپ‌چین</button>
+              <button type="button" class="seg-btn" id="respAuto" data-key="responseDir" data-val="auto" title="تشخیص جهت هر پاراگراف" aria-pressed="false">خودکار</button>
+              <button type="button" class="seg-btn" id="respRtl" data-key="responseDir" data-val="rtl" title="راست‌چین، مناسب متن فارسی" aria-pressed="false">راست‌چین</button>
+            </div>
           </div>
-          <span class="version-text" id="versionText"></span>
-        </div>
-      </footer>
-
-    </div><!-- /.glass -->
-
-
-
+          <div class="direction-setting">
+            <div class="setting-heading"><h3 id="composerLabel">کادر نوشتن پیام</h3></div>
+            <div class="seg" role="group" aria-labelledby="composerLabel" data-motion="instant">
+              <button type="button" class="seg-btn" id="compLtr" data-key="composerDir" data-val="ltr" title="چپ‌چین" aria-pressed="false">چپ‌چین</button>
+              <button type="button" class="seg-btn" id="compAuto" data-key="composerDir" data-val="auto" title="تشخیص خودکار فارسی و انگلیسی" aria-pressed="false">خودکار</button>
+              <button type="button" class="seg-btn" id="compRtl" data-key="composerDir" data-val="rtl" title="راست‌چین" aria-pressed="false">راست‌چین</button>
+            </div>
+          </div>
+        </section>
+        <section class="panel reading-panel" aria-labelledby="readingHeading">
+          <h2 id="readingHeading" class="sr-only">خواندن راحت‌تر</h2>
+          <div class="control-row">
+            <div class="control-copy"><label for="mathSwitch">اصلاح فرمول‌های ریاضی</label><small id="mathDescription">ترتیب درست عددها و علامت‌ها</small></div>
+            <label class="switch" data-motion="instant"><input type="checkbox" id="mathSwitch" data-key="mathFix" aria-describedby="mathDescription" /><span class="slider" aria-hidden="true"></span></label>
+          </div>
+          <div class="control-row">
+            <div class="control-copy"><label for="fontSwitch">فونت فارسی ایران‌سنس</label><small id="fontDescription">خواناتر شدن متن‌های راست‌چین</small></div>
+            <label class="switch" data-motion="instant"><input type="checkbox" id="fontSwitch" data-key="fontFix" aria-describedby="fontDescription" /><span class="slider" aria-hidden="true"></span></label>
+          </div>
+          <div class="control-row" id="claudeThemeRow" hidden>
+            <div class="control-copy"><label for="claudeThemeSwitch">پس‌زمینهٔ مشکی Claude</label><small id="claudeDescription">گزینهٔ نمایش مخصوص سایت Claude</small></div>
+            <label class="switch" data-motion="instant"><input type="checkbox" id="claudeThemeSwitch" data-key="claudeDarkSurface" aria-describedby="claudeDescription" /><span class="slider" aria-hidden="true"></span></label>
+          </div>
+        </section>
+      </fieldset>
+      <div class="status-row" role="status" aria-live="polite" aria-atomic="true">
+        <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+        <span id="status">در حال خواندن تنظیمات…</span>
+        <button id="retryBtn" type="button" hidden>تلاش دوباره</button>
+      </div>
+    </main>
+    <footer>
+      <button id="ctaBtn" type="button" class="community-link" aria-label="کانال تلگرام GptGate">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-4 18-6-6-4 3 1-6L3 10 21 3Z"/><path d="m8 12 9-6-6 9"/></svg>
+        <span>تلگرام GptGate</span>
+      </button>
+      <span id="versionText" dir="ltr"></span>
+    </footer>
     <script type="module" src="popup.js"></script>
   </body>
 </html>
