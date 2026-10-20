@@ -10,8 +10,8 @@ const STYLE = `
 *{box-sizing:border-box}[hidden]{display:none!important}
 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;min-width:44px;padding:8px 12px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:500 13px/20px GPTGateUI,sans-serif;cursor:pointer;touch-action:manipulation;transition:transform 150ms cubic-bezier(.32,.72,0,1)}
 button:active{transform:scale(.98)}button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button:disabled{opacity:.5;cursor:default;transform:none}
-@media(hover:hover){button:hover:not(:disabled){background:var(--hover)}}
-.trigger{border:1px solid var(--line);background:var(--bg);white-space:nowrap}.trigger[aria-expanded="true"]{background:var(--hover)}
+@media(hover:hover){button:not(.trigger):hover:not(:disabled){background:var(--hover)}.trigger:hover:not(:disabled){color:var(--accent)}}
+.trigger{white-space:nowrap;color:var(--muted)}.trigger[aria-expanded="true"]{color:var(--accent)}.trigger>svg:first-child{width:20px;height:20px}
 svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .panel{position:fixed;inset:auto;margin:0;width:304px;max-width:calc(100vw - 24px);padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;direction:rtl;overflow:auto;max-height:calc(100dvh - 24px)}
 .panel:popover-open{animation:enter 150ms cubic-bezier(.32,.72,0,1)}
@@ -22,13 +22,13 @@ svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:
 .brand{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 4px 0;padding-top:8px;border-top:1px solid var(--line);font:400 12px/20px GPTGateUI,sans-serif;color:var(--muted);white-space:nowrap}.brand img{width:16px;height:16px;filter:var(--logo-filter);opacity:.8}.brand b{font-weight:500}
 :host([data-keyboard]) button{transition:none}:host([data-keyboard]) .panel{animation:none}
 @media(prefers-reduced-motion:reduce){button{transition:none}.panel:popover-open{animation:none}}
-@media(forced-colors:active){button,.panel{border:1px solid ButtonText}.primary{outline:1px solid Highlight}}
+@media(forced-colors:active){button:not(.trigger),.panel{border:1px solid ButtonText}.primary{outline:1px solid Highlight}}
 `;
 const sheet = new CSSStyleSheet(); sheet.replaceSync(STYLE);
 let fontsRegistered = false;
 let control;
 const icon = paths => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
-const fileIcon = icon('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 15h8M8 18h5"/>');
+const fileIcon = icon('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6m-3-3 3 3 3-3"/>');
 // Unknown renderers must reselect if text changes, rather than silently export a recycled node.
 const selectionKey = el => messageIdentity(el) || el.textContent;
 function createControl() {

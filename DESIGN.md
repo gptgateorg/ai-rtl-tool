@@ -58,7 +58,9 @@ See docs/live-chrome-validation.md for current live-site and performance evidenc
 
 ## ChatGPT PDF control
 
-One 44px header trigger uses the same 13px/500 UI scale and a 16px stroke icon.
+One 44px header trigger uses the same 13px/500 UI scale and a 20px document-download
+stroke icon. The trigger has no background or border, including hover/open states;
+color communicates hover/open state and keyboard focus retains its outline.
 The menu is at most 304px wide, with 12px viewport clearance, 12px corners, a
 one-pixel border and no decorative shadow. Two actions name their scope:
 whole conversation or select a response. The supplied mark and the approved
