@@ -1,33 +1,76 @@
 # Chrome Web Store listing draft
 
 Status: local draft; not uploaded or submitted.
-Product: GptGate, version 0.1.1
-Primary listing language: Persian
-Suggested category: Productivity / Tools (choose the equivalent available category).
-Distribution: free, public; confirm dashboard countries and publishing timing before submission.
+Product: GptGate, version 0.1.2
+Existing item: cfpildhdgidgaiigofflnekhpadmkdak (update; do not create a duplicate).
+Default locale: Persian. Persian and English metadata are bundled; the interface remains Persian.
+Use the corresponding language tab for each description. Do not claim an English interface.
+Category: Tools. Preserve the current public/free distribution unless approved otherwise.
+
+## Persian title
+
+GptGate | فارسی در ChatGPT، Gemini و Claude
 
 ## Persian short description
 
-فارسی روان‌تر در ChatGPT، Gemini و Claude؛ تنظیم جهت و فونت، و خروجی PDF و Word از ChatGPT.
+راست‌چین فارسی، تغییر فونت و وزن در ChatGPT، Gemini و Claude؛ ذخیرهٔ گفتگوی ChatGPT به PDF و Word، بدون حساب GptGate.
 
 ## Persian detailed description
 
-GptGate خواندن و نوشتن فارسی در ChatGPT، Gemini و Claude را ساده‌تر می‌کند.
+فارسی را در ChatGPT، Gemini و Claude راحت‌تر بخوانید و بنویسید. با افزونهٔ GptGate جهت متن، فونت فارسی و وزن نوشته‌ها را انتخاب کنید؛ از گفتگوی ChatGPT هم خروجی PDF یا فایل Word قابل ویرایش بگیرید.
 
-• جهت پاسخ‌ها و کادر نوشتن را جداگانه انتخاب کنید: راست‌به‌چپ، چپ‌به‌راست یا خودکار.
-• فونت و وزن دلخواهتان را انتخاب کنید، یا فایل فونت خودتان را از دستگاه وارد کنید.
-• متن‌های ترکیبی فارسی و انگلیسی، کد و فرمول را خواناتر ببینید.
-• در ChatGPT، عنوان گفتگوهای سایدبار و متن یادآورهای صفحهٔ اول را مرتب‌تر بخوانید.
-• از کل گفتگوی در دسترس یا یک پاسخ در ChatGPT، خروجی PDF یا Word بگیرید.
+وقتی یک پاسخ فارسی با کلمه‌های انگلیسی، عدد یا فرمول ترکیب می‌شود، خواندنش می‌تواند سخت شود. GptGate کمک می‌کند نمایش متن را مطابق نیازتان تنظیم کنید، بدون ساخت حساب جداگانه.
 
-بدون ساخت حساب GptGate و بدون سرور خروجی. آماده‌سازی فایل روی دستگاه شما انجام می‌شود. تنظیمات ممکن است با Chrome Sync همگام شوند؛ فایل فونت آپلودی روی همان دستگاه می‌ماند.
+جهت متن را خودتان انتخاب کنید
+• پاسخ‌ها و کادر نوشتن پیام، تنظیم جداگانه دارند: راست‌چین، چپ‌چین یا خودکار.
+• حالت خودکار، جهت هر پاراگراف را متناسب با متن تشخیص می‌دهد.
+• تنظیم نمایش فرمول‌های ریاضی هم در دسترس است.
+• در ChatGPT، عنوان گفتگوهای سایدبار و یادآورهای صفحهٔ اول با فونت انتخابی و تراز مناسب نمایش داده می‌شوند؛ جای سایدبار تغییر نمی‌کند.
 
-خروجی PDF از پنجرهٔ چاپ مرورگر ذخیره می‌شود. خروجی Word یک فایل قابل ویرایش .docx است؛ فونت‌ها داخل آن جاسازی نمی‌شوند و صفحه‌بندی آن می‌تواند با PDF فرق داشته باشد. خروجی گفتگو به پیام‌هایی محدود است که صفحه در دسترس قرار می‌دهد.
+فونت فارسی، مطابق سلیقهٔ شما
+• ایران‌سنس، وزیرمتن، شبنم یا ساحل را انتخاب کنید.
+• وزن‌های موجود هر فونت را امتحان کنید و نمونهٔ متن را در پنجرهٔ افزونه ببینید.
+• فونت خودتان را با فرمت WOFF2، WOFF، TTF یا OTF، تا ۲ مگابایت، از دستگاه اضافه کنید.
 
-راهنمای کوتاه اولین استفاده، تنظیمات اصلی را معرفی می‌کند و هر وقت بخواهید دوباره در دسترس است.
+ذخیرهٔ ChatGPT به PDF و Word
+• از منوی خروجی بالای گفتگو، کل گفتگوی در دسترس یا یک پاسخ را انتخاب کنید.
+• پیش‌نمایش را ببینید و از پنجرهٔ چاپ مرورگر، PDF ذخیره کنید.
+• برای ادامهٔ ویرایش، فایل Word با پسوند .docx دانلود کنید.
+این قابلیت فقط برای ChatGPT است؛ تنظیم فونت و جهت متن در Gemini و Claude هم کار می‌کند.
 
-GptGate یک ابزار مستقل است و محصول رسمی OpenAI، Google یا Anthropic نیست.
+شروع کار
+۱. افزونه را نصب کنید و یکی از سایت‌های پشتیبانی‌شده را باز کنید.
+۲. پنجرهٔ GptGate را از نوار افزونه‌های Chrome باز کنید.
+۳. جهت و فونت دلخواهتان را انتخاب کنید. راهنمای اولین استفاده هم کنارتان است.
+
+حریم خصوصی و نکته‌های خروجی
+برای خود GptGate حساب یا اشتراک لازم نیست. حساب سایت‌های میزبان مستقل است. آماده‌سازی PDF و Word روی دستگاه انجام می‌شود و گفتگو برای خروجی به سرور GptGate ارسال نمی‌شود. فونت واردشده روی همان دستگاه می‌ماند؛ تنظیمات ممکن است از طریق Chrome Sync همگام شوند.
+
+خروجی گفتگو محدود به پیام‌هایی است که صفحه در دسترس قرار می‌دهد؛ پیام‌ها و تصاویر خارج از دسترس ممکن است در فایل نباشند. فونت‌ها در Word جاسازی نمی‌شوند و صفحه‌بندی آن می‌تواند با PDF فرق داشته باشد.
+
+GptGate ابزاری مستقل است و محصول رسمی OpenAI، Google یا Anthropic نیست.
 پشتیبانی: info@gptgate.ai
+
+## English localized description draft
+
+Title: GptGate | Persian fonts and RTL for AI chats
+
+Summary: Persian fonts and text direction for ChatGPT, Gemini and Claude. Export ChatGPT conversations to PDF or editable Word locally.
+
+The interface and first-use guide are in Persian. Read and write Persian more comfortably in ChatGPT, Gemini and Claude. Choose text direction, a Persian font and its available weights, then save accessible ChatGPT conversations as PDF or editable Word files.
+
+READ AND WRITE YOUR WAY
+Choose automatic, right-to-left or left-to-right direction separately for replies and your message box. Select IRANSansX, Vazirmatn, Shabnam or Sahel, or add your own WOFF2, WOFF, TTF or OTF font file up to 2 MB. Math display correction is also available.
+
+SAVE A CHATGPT CONVERSATION
+Use the conversation header menu to export the accessible conversation or select one response. Review the local preview, save a PDF through Chrome's print dialog, or download an editable .docx file. Export is available on ChatGPT only; font and direction controls also support Gemini and Claude.
+
+NO SEPARATE GPTGATE ACCOUNT
+Export preparation happens on your device. GptGate does not upload conversations to an export server. Preferences may sync through Chrome Sync; imported font files stay on the device. Host websites may require their own accounts.
+
+Exports depend on messages and images accessible to the page. Word files do not embed fonts and may paginate differently from PDF. GptGate is independent and is not an official product of OpenAI, Google or Anthropic.
+
+Support: info@gptgate.ai
 
 ## Reviewer single-purpose explanation
 
@@ -78,7 +121,7 @@ account holder without their confirmation.
 
 ## Required before submission
 
-- Add the supplied project's IRANSans license code and FontLicense.txt.
+- Confirm the bundled owner-supplied IRANSans notice (8OHVZX36) is included.
 - Publish the reviewed extension-specific privacy policy and enter its real URL.
 - Include bundled dependency notices in the upload ZIP.
 - Confirm developer account identity, store listing, screenshots, distribution,

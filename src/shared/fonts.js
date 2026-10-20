@@ -47,7 +47,8 @@ export function fontCSS(raw, custom, getURL = p => chrome.runtime.getURL(p)) {
   const faces = fontFamily === 'custom'
     ? `@font-face{font-family:"${font.family}";src:url("${custom.data}");font-weight:400;font-display:swap;}`
     : font.files.map((file,i)=>`@font-face{font-family:"${font.family}";src:url("${getURL(`fonts/${file}`)}") format("woff2");font-weight:${font.variable || font.weights[i]};font-style:normal;font-display:swap;}`).join('\n');
-  return {faces, family: font.family, weight: fontWeight};
+  const license = fontFamily === 'iransans' ? '/*! IRANSansX is proprietary software. License: 8OHVZX36. Terms: https://fontiran.com/ — see fonts/FontLicense.txt. */\n' : '';
+  return {faces:license+faces, family: font.family, weight: fontWeight};
 }
 
 export function createFontController(selectors) {

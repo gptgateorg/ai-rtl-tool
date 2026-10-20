@@ -36,7 +36,7 @@ async function open(browser, options = {}) {
       });
     };
     window.chrome = {
-      runtime:{getURL:p=>'https://popup.test/'+p,getManifest:()=>({version:'0.1.1',content_scripts:[
+      runtime:{getURL:p=>'https://popup.test/'+p,getManifest:()=>({version:'0.1.2',content_scripts:[
         {matches:['https://chatgpt.com/*','https://chat.openai.com/*'],js:['src/chatgpt/content.js']},
         {matches:['https://gemini.google.com/*'],js:['src/gemini/content.js']},
         {matches:['https://claude.ai/*'],js:['src/claude/content.js']},

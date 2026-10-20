@@ -34,6 +34,9 @@ Webfonts/fonts/woff2/. Their current bytes match those archive entries. The
 original IRANSansX-MediumD4.woff2 remains preserved from baseline 244006e.
 The archive's supplied material is the provenance for the proprietary faces;
 the bundled OFL documents below apply to the named open-font projects.
+The owner supplied license code 8OHVZX36 for this release. Its notice is shipped
+in [FontLicense.txt](FontLicense.txt) and referenced beside font declarations.
+The code is owner-provided; it was not independently authenticated with Font Iran.
 
 [sources.json](sources.json) records pinned upstream commits and exact source to
 local-file mappings for the official Vazirmatn, Shabnam, and Sahel projects:

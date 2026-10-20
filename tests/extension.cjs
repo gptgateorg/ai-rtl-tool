@@ -11,6 +11,17 @@ const {chromium,root,output}=require('./harness.cjs');
  try{
   const worker=context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   const id=new URL(worker.url()).host;
+  // Worker creation can precede listener registration; don't navigate fixtures
+  // until the installed extension can receive their activation/load events.
+  await worker.evaluate(async()=>{
+   const deadline=Date.now()+5000;
+   while(!globalThis.chrome?.tabs?.onUpdated.hasListeners() || !chrome.tabs.onActivated.hasListeners()){
+    if(Date.now()>deadline)throw Error('Badge listeners did not initialize');
+    await new Promise(resolve=>setTimeout(resolve,25));
+   }
+  });
+  const localized=await worker.evaluate(()=>({name:chrome.i18n.getMessage('extensionName'),description:chrome.i18n.getMessage('extensionDescription')}));
+  assert.ok(localized.name.startsWith('GptGate'));assert.ok(localized.description.includes('ChatGPT'));
   await context.route(/^https?:/,route=>{
    const host=new URL(route.request().url()).hostname;
    if(!['chatgpt.com','gemini.google.com','claude.ai','store-permission.test'].includes(host))return route.abort();

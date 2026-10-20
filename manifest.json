@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GptGate",
-  "version": "0.1.1",
-  "description": "فارسی روان‌تر در ChatGPT، Gemini و Claude؛ تنظیم جهت و فونت، و خروجی PDF و Word از ChatGPT.",
+  "name": "__MSG_extensionName__",
+  "version": "0.1.2",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "images/logo.png",
     "48": "images/logo.png",
@@ -88,5 +88,6 @@
         "https://claude.ai/*"
       ]
     }
-  ]
+  ],
+  "default_locale": "fa"
 }

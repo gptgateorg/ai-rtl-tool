@@ -39,6 +39,7 @@ function createControl() {
   if (!fontsRegistered) {
     fontsRegistered = true;
     for (const [weight, file] of [['400','Regular'],['500','Medium']]) {
+      /*! IRANSansX: proprietary software, license 8OHVZX36. See fonts/FontLicense.txt and https://fontiran.com/. */
       const font = new FontFace('GPTGateUI',`url("${chrome.runtime.getURL(`fonts/IRANSansX-${file}.woff2`)}")`,{weight,display:'swap'});
       document.fonts.add(font); // Load only the face actually used by a visible control.
     }

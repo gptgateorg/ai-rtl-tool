@@ -1,4 +1,6 @@
 /* Windows brand and sun/moon artwork, scaled for a compact browser utility. */
+/*! IRANSansX is proprietary software. License: 8OHVZX36.
+    Terms: https://fontiran.com/ — see fonts/FontLicense.txt. */
 @font-face {
     font-family: "IRANSansX";
     src: url("fonts/popup/IRANSansX-Regular.woff2") format("woff2");
