@@ -13,7 +13,7 @@ const {chromium,root,output}=require('./harness.cjs');
   const id=new URL(worker.url()).host;
   await context.route(/^https?:/,route=>{
    const host=new URL(route.request().url()).hostname;
-   if(!['chatgpt.com','gemini.google.com','claude.ai'].includes(host))return route.abort();
+   if(!['chatgpt.com','gemini.google.com','claude.ai','store-permission.test'].includes(host))return route.abort();
    return route.fulfill({contentType:'text/html',body:`<!doctype html><html><head><meta charset="utf-8"><title>Isolated ${host} fixture</title></head><body><main><article data-message-author-role="assistant" class="font-claude-message markdown prose"><model-response><p id="persian">این یک متن فارسی برای آزمایش است.</p><p id="english">English explanation with Persian مثال.</p><p>فرمول <span class="katex" id="math">x + y = 2</span></p></model-response></article><textarea id="prompt-textarea" name="prompt-textarea">سلام Hello</textarea><button id="native">Native site control</button></main></body></html>`});
   });
   const sites=[];
@@ -38,6 +38,16 @@ const {chromium,root,output}=require('./harness.cjs');
   for(const page of sites)await page.waitForFunction(()=>!document.body.classList.contains('gptgate-math-fix'));
   const saved=await worker.evaluate(()=>chrome.storage.sync.get(null));
   assert.equal(saved.responseDir,'ltr');assert.equal(saved.composerDir,'ltr');assert.equal(saved.fontFix,false);assert.equal(saved.mathFix,false);
+  // Matching host permissions expose supported URLs without blanket tabs access.
+  const supported=await worker.evaluate(()=>chrome.tabs.query({url:['https://chatgpt.com/*','https://gemini.google.com/*','https://claude.ai/*']}));
+  assert.equal(supported.length,3);assert.ok(supported.every(t=>t.url));
+  for(const tab of supported)assert.equal(await worker.evaluate(id=>chrome.action.getBadgeText({tabId:id}),tab.id),'ON');
+  const unrelated=await context.newPage();await unrelated.goto('https://store-permission.test/');
+  const unrelatedId=await worker.evaluate(async()=>{const tabs=await chrome.tabs.query({active:true,currentWindow:true});return tabs[0].id;});
+  const unrelatedTab=await worker.evaluate(id=>chrome.tabs.get(id),unrelatedId);
+  assert.equal(unrelatedTab.url,undefined,'Unrelated URLs must not be readable without tabs permission');
+  assert.equal(await worker.evaluate(id=>chrome.action.getBadgeText({tabId:id}),unrelatedId),'');
+  await unrelated.close();
   await popup.close();
   const reopened=await context.newPage();await reopened.goto(`chrome-extension://${id}/popup.html`);
   await reopened.waitForFunction(()=>!document.querySelector('#settings').disabled);

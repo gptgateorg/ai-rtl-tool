@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GptGate",
   "version": "0.1.1",
-  "description": "Toggle RTL for responses/composer and enforce LTR for math (KaTeX/MathJax) on ChatGPT, Gemini, and Claude.",
+  "description": "فارسی روان‌تر در ChatGPT، Gemini و Claude؛ تنظیم جهت و فونت، و خروجی PDF و Word از ChatGPT.",
   "icons": {
     "16": "images/logo.png",
     "48": "images/logo.png",
@@ -10,7 +10,6 @@
   },
   "permissions": [
     "storage",
-    "tabs",
     "scripting"
   ],
   "host_permissions": [

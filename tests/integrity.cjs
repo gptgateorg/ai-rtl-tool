@@ -4,12 +4,13 @@ const files=['src/claude/content.js','src/claude/selectors.js','src/gemini/conte
 for(const file of files)assert.deepEqual(fs.readFileSync(path.join(root,file)),execFileSync('git',['show',`244006e:${file}`],{cwd:root}),`Out-of-scope modification: ${file}`);
 const dist=path.join(root,'dist');
 const manifest=JSON.parse(fs.readFileSync(path.join(dist,'manifest.json')));
-assert.deepEqual(manifest.permissions,['storage','tabs','scripting']);
+assert.deepEqual(manifest.permissions,['storage','scripting']);
 const popup=fs.readFileSync(path.join(root,'popup.js'),'utf8');
 assert.ok(!/fetch\(|setInterval|requestAnimationFrame|offsetWidth|offsetLeft/.test(popup),'No popup network/polling/layout animation code');
 assert.ok(!/account|password|token|login/i.test(fs.readFileSync(path.join(root,'popup.html'),'utf8')));
 assert.deepEqual(manifest.host_permissions,JSON.parse(execFileSync('git',['show','244006e:manifest.json'],{cwd:root})).host_permissions);
 for(const f of ['src/shared/fonts.js','src/shared/export-content.js','src/chatgpt/pdf-export.js','export.html'])assert.ok(fs.existsSync(path.join(dist,f)),f);
+assert.ok(fs.readFileSync(path.join(dist,'THIRD_PARTY_NOTICES.txt'),'utf8').includes('docx 9.13.0'),'Bundled software notices must ship');
 assert.ok(!popup.includes('آماده برای'));
 assert.ok(!popup.includes('ذخیره شد و روی تب‌های باز اعمال شد'));
-console.log(`PASS scope integrity: ${files.length} unrelated engines/assets preserved; permissions/hosts unchanged; export resources packaged.`);
+console.log(`PASS scope integrity: ${files.length} unrelated engines/assets preserved; minimal permissions, unchanged hosts, notices and export resources packaged.`);

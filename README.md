@@ -123,8 +123,10 @@ session data clears when Chrome closes. Export does not send conversations to
 an account, API, or export server. Image export uses already loaded pixels and
 does not fetch missing images. The Telegram action opens only when chosen.
 
-The feature adds no permissions or host domains. Existing storage, tabs, and
-scripting permissions support preferences and supported-site integration.
+Storage and scripting permissions support preferences and supported-site
+integration. Host access is restricted to the supported services. Broad tabs
+permission was removed during store preparation; unrelated tab URLs are not
+needed. Third-party software notices ship in THIRD_PARTY_NOTICES.txt.
 
 ## Development and validation
 
