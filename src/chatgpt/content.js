@@ -1,10 +1,14 @@
 (async () => {
   try {
+    if (window.__gptgate_chatgpt_engine) return;
+    const { syncExportUI } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
     const selectors = await import(chrome.runtime.getURL('src/chatgpt/selectors.js'));
     const { SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS } = selectors;
     const core = await import(chrome.runtime.getURL('src/shared/core.js'));
     const { detectComposerDirection, detectTextDirection } = await import(chrome.runtime.getURL('src/shared/constants.js'));
     core.initExtension({ SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS });
+
+    window.__gptgate_chatgpt_engine = true;
 
     /* ── ChatGPT RTL Engine ── */
 
@@ -331,6 +335,7 @@
 
     // ── MutationObserver for dynamic content ──
     let flushScheduled = false;
+    let exportSyncNeeded = false;
     const raf = window.requestAnimationFrame
       ? window.requestAnimationFrame.bind(window)
       : (cb) => setTimeout(cb, 16);
@@ -340,6 +345,7 @@
       flushScheduled = true;
       raf(() => {
         flushScheduled = false;
+        if (exportSyncNeeded) { exportSyncNeeded = false; syncExportUI(); }
         scanResponses();
         findAndFixComposers();
         fixCodeBlocks();
@@ -350,13 +356,12 @@
     const contentObserver = new MutationObserver((mutations) => {
       let shouldFlush = false;
       for (const m of mutations) {
-        if (m.type === 'characterData') {
+        if (m.type === 'attributes') { shouldFlush = true; exportSyncNeeded = true; }
+        if (m.type === 'characterData') shouldFlush = true;
+        if ([...m.addedNodes, ...m.removedNodes].some(node => node.nodeType === 3)) shouldFlush = true;
+        if ([...m.addedNodes, ...m.removedNodes].some(node => node.nodeType === 1 && node.localName !== 'gptgate-export-tools')) {
           shouldFlush = true;
-          break;
-        }
-        if (m.addedNodes.length > 0) {
-          shouldFlush = true;
-          break;
+          exportSyncNeeded = true;
         }
       }
       if (shouldFlush) scheduleFlush();
@@ -461,7 +466,9 @@
       contentObserver.observe(document.body, {
         childList: true,
         subtree: true,
-        characterData: true
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['data-message-author-role','hidden','aria-hidden','inert']
       });
 
       // Observe body class changes (popup mode switching)
@@ -472,6 +479,7 @@
 
       // Initial scan
       const run = () => {
+        syncExportUI();
         scanAll();
         findAndFixComposers();
         fixCodeBlocks();
@@ -495,6 +503,7 @@
         if (location.href !== lastUrl) {
           lastUrl = location.href;
           setTimeout(() => {
+            syncExportUI();
             scanAll();
             findAndFixComposers();
             fixCodeBlocks();

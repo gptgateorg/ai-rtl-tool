@@ -9,8 +9,7 @@
   <body>
     <header class="popup-header">
       <div class="brand">
-        <img src="images/logo.png" width="40" height="40" alt="" />
-        <div><h1><bdi>GptGate</bdi></h1><p>برای متن فارسی و انگلیسی</p></div>
+        <h1><img class="brand-wordmark" src="images/brand-fa.svg" width="190" height="62" alt="جی‌پی‌تی گیت" /></h1>
       </div>
       <div class="theme-switcher" data-motion="instant">
         <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="نمای تیرهٔ افزونه" title="نمای تیرهٔ افزونه">
@@ -53,9 +52,23 @@
             <label class="switch" data-motion="instant"><input type="checkbox" id="mathSwitch" data-key="mathFix" aria-describedby="mathDescription" /><span class="slider" aria-hidden="true"></span></label>
           </div>
           <div class="control-row">
-            <div class="control-copy"><label for="fontSwitch">فونت فارسی ایران‌سنس</label><small id="fontDescription">خواناتر شدن متن‌های راست‌چین</small></div>
+            <div class="control-copy"><label for="fontSwitch">فونت گفتگو</label><small id="fontDescription">متن خواناتر با فونت دلخواه</small></div>
             <label class="switch" data-motion="instant"><input type="checkbox" id="fontSwitch" data-key="fontFix" aria-describedby="fontDescription" /><span class="slider" aria-hidden="true"></span></label>
           </div>
+          <details class="font-settings" id="fontSettings">
+            <summary>انتخاب فونت و وزن <span id="fontSummary"></span></summary>
+            <div class="font-fields">
+              <label>فونت<select id="fontFamily" aria-label="فونت گفتگو"></select></label>
+              <label>وزن<select id="fontWeight" aria-label="وزن فونت"></select></label>
+            </div>
+            <p class="font-preview" id="fontPreview">گفتگو، روشن‌تر از همیشه.<br><span lang="en" dir="ltr">A clearer conversation. ۱۲۳</span></p>
+            <div class="upload-row">
+              <button type="button" id="uploadFont">افزودن فونت من</button>
+              <button type="button" id="removeFont" hidden>حذف فونت من</button>
+              <input type="file" id="fontFile" accept=".woff2,.woff,.ttf,.otf" hidden />
+            </div>
+            <p class="font-note" id="fontNote">فایل WOFF2، WOFF، TTF یا OTF تا ۲ مگابایت؛ فقط روی این دستگاه ذخیره می‌شود.</p>
+          </details>
           <div class="control-row" id="claudeThemeRow" hidden>
             <div class="control-copy"><label for="claudeThemeSwitch">پس‌زمینهٔ مشکی Claude</label><small id="claudeDescription">گزینهٔ نمایش مخصوص سایت Claude</small></div>
             <label class="switch" data-motion="instant"><input type="checkbox" id="claudeThemeSwitch" data-key="claudeDarkSurface" aria-describedby="claudeDescription" /><span class="slider" aria-hidden="true"></span></label>

@@ -1,3 +1,5 @@
+import { normalizeFont } from './fonts.js';
+
 /**
  * constants.js – Shared constants & utilities for GptGate extension
  * Single source of truth for DEFAULT_STATE, normalizeState, host origins, etc.
@@ -9,6 +11,8 @@ export const DEFAULT_STATE = {
   composerDir: 'auto',
   mathFix: true,
   fontFix: true,
+  fontFamily: 'iransans',
+  fontWeight: 500,
   claudeDarkSurface: true
 };
 
@@ -53,7 +57,7 @@ export function normalizeState(raw = {}) {
   const claudeDarkSurface =
     raw.claudeDarkSurface != null ? !!raw.claudeDarkSurface : DEFAULT_STATE.claudeDarkSurface;
 
-  return { responseDir, composerDir, mathFix, fontFix, claudeDarkSurface };
+  return { responseDir, composerDir, mathFix, fontFix, claudeDarkSurface, ...normalizeFont(raw) };
 }
 
 /**

@@ -1,14 +1,18 @@
-# Candidates after the visual port
+# Candidates after the font and PDF extension
 
-These are proposals based on the current code and user goal, not implemented
-features or validated user-research conclusions. They keep the utility account-free.
+Font family/weight selection, a mixed-language font sample, custom local upload,
+ChatGPT response/conversation PDF previews, and the supplied Persian branding
+are implemented. The sample previews typography; it does not simulate the
+site's automatic direction or math engine.
 
-| Priority | Candidate | User benefit | Cost / validation needed |
+The following remain proposals, not implemented features or validated research.
+
+| Priority | Candidate | User benefit | Validation needed |
 | --- | --- | --- | --- |
-| 1 | Separate preferences per service | Keep Claude and ChatGPT comfortable without repeatedly changing global choices | Migrate existing global settings without loss; make the active scope explicit; test every broadcast path |
-| 2 | Restore recommended settings with Undo | Recover quickly after choosing an unsuitable direction or font | Preserve previous values; no destructive confirmation flow; test persistence and Undo |
-| 3 | A small mixed-language preview | Explain automatic/right/left behavior using Persian, English and a formula before changing a page | Keep preview in popup, avoid external requests and heavy math dependencies; verify narrow layouts |
+| 1 | Separate preferences per service | Keep each service comfortable without repeatedly changing global choices | Migrate global settings without loss; expose active scope; cover broadcasts |
+| 2 | Restore recommended settings with Undo | Recover quickly after an unsuitable direction or font choice | Preserve previous values; test persistence and Undo |
+| 3 | Direction/math preview | Explain automatic/right/left behavior before changing a page | Distinguish it from the implemented font sample; reuse real direction/math behavior without heavy dependencies |
 
-Start by testing whether ordinary Persian-speaking users can choose the correct
-direction and understand the forced-RTL math explanation. Add a candidate only
-when it solves a witnessed problem; do not turn the tool into an account dashboard.
+Test whether Persian-speaking users understand direction, forced-RTL math,
+device-only custom fonts, and the limits shown before PDF printing. Keep the
+utility account-free and add proposals only when they solve an observed problem.

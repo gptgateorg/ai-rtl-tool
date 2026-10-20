@@ -32,6 +32,9 @@ async function sample(page,selector,pseudo,time){
    document.querySelector('#themeToggle').setAttribute('aria-checked','false');
   });
   await page.waitForTimeout(450);
+  // Settle the setup transition deterministically under concurrent CPU load.
+  // The independent timeline comparisons below still sample the real curves.
+  await Promise.all([page,ref].map(p=>p.evaluate(()=>document.getAnimations().forEach(a=>a.finish()))));
   for(const [actual,expected,pseudo] of [['.slider','.slider','::before'],['.slider','.slider','::after'],['.theme-toggle','.theme-toggle',null],['.theme-toggle-thumb','.theme-toggle-thumb',null]]){
    const a=await capture(page,actual,pseudo),b=await capture(ref,expected,pseudo);
    // The reduced-motion global fallback has 0s instead of Windows' 0.01ms; geometry remains exact.

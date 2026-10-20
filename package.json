@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "npm run build && node tests/integrity.cjs && node tests/popup.cjs && node tests/motion.cjs && node tests/extension.cjs",
-    "test:performance": "node tests/performance.cjs"
+    "test": "npm run build && node tests/integrity.cjs && node tests/popup.cjs && node tests/motion.cjs && node tests/extension.cjs && node tests/features.cjs",
+    "test:performance": "node tests/performance.cjs && node tests/site-performance.cjs"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.23",

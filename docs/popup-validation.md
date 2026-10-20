@@ -1,4 +1,10 @@
-# Popup validation
+# Popup validation — historical initial port
+
+This report records the initial popup-only phase, committed as `a3330b1`.
+Its scope, byte-identity statements, and numbers describe that phase. The later
+authorized font/PDF/brand work is documented in
+[the current feature report](font-pdf-validation.md); the runtime scope and
+asset set have since expanded. Historical measurements below are preserved.
 
 ## Scope
 

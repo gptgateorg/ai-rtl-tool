@@ -1,4 +1,5 @@
 import { DEFAULT_STATE, normalizeState, HOST_ORIGINS, LEGACY_KEYS } from './src/shared/constants.js';
+import { FONT_CATALOG, WEIGHT_LABELS, CUSTOM_FONT_KEY, fontCSS, normalizeFont, readFontFile, validCustomFont } from './src/shared/fonts.js';
 
 const $ = (id) => document.getElementById(id);
 const THEME_KEY = 'gptgate_popup_theme';
@@ -10,9 +11,13 @@ let pendingSave = false;
 let revision = 0;
 let retry = null;
 let explicitTheme = null;
+let customFont = null;
+let uploadRevision = 0;
+let previewSignature = '';
 
 function setStatus(text, tone = '', action = null) {
   $('status').textContent = text;
+  $('status').closest('.status-row').hidden = !text;
   $('statusDot').className = `status-dot ${tone}`;
   retry = action;
   $('retryBtn').hidden = !action;
@@ -38,7 +43,76 @@ function applyStateToUI() {
   $('mathDescription').textContent = mathRequired
     ? 'در حالت راست‌چین، همیشه فعال است'
     : 'ترتیب درست عددها و علامت‌ها';
+  updateFontUI();
 }
+
+for (const [id,font] of Object.entries(FONT_CATALOG)) $('fontFamily').add(new Option(font.label,id));
+const previewStyle = document.createElement('style');
+document.head.append(previewStyle);
+function updateFontUI() {
+  const font = FONT_CATALOG[state.fontFamily];
+  $('fontFamily').value = state.fontFamily;
+  $('fontFamily').querySelector('[value="custom"]').disabled = !customFont && state.fontFamily !== 'custom';
+  const weights = font.weights;
+  $('fontWeight').replaceChildren(...weights.map(weight=>new Option(state.fontFamily === 'custom' ? 'وزن خود فایل' : WEIGHT_LABELS[weight],weight)));
+  $('fontWeight').value = String(state.fontWeight);
+  $('fontWeight').disabled = state.fontFamily === 'custom';
+  $('fontSummary').textContent = font.label;
+  $('removeFont').hidden = !customFont;
+  $('uploadFont').textContent = customFont ? 'جایگزینی فونت من' : 'افزودن فونت من';
+  $('fontNote').textContent = customFont ? `${customFont.name} — فقط روی این دستگاه`
+    : state.fontFamily === 'custom' ? 'فونت شما روی این دستگاه نیست؛ فعلاً وزیرمتن نمایش داده می‌شود. فایل را دوباره اضافه کنید.'
+    : 'فایل WOFF2، WOFF، TTF یا OTF تا ۲ مگابایت؛ فقط روی این دستگاه ذخیره می‌شود.';
+  // Collapsed settings never download preview fonts.
+  if (!$('fontSettings').open) return;
+  const signature = `${state.fontFamily}:${state.fontWeight}:${customFont?.data || ''}`;
+  if (previewSignature === signature) return;
+  previewSignature = signature;
+  const {faces,family,weight} = fontCSS(state,customFont);
+  previewStyle.textContent = `${faces} #fontPreview{font-family:"${family}",sans-serif;font-weight:${weight}}`;
+}
+$('fontSettings').addEventListener('toggle', updateFontUI);
+$('fontFamily').addEventListener('change', () => {
+  uploadRevision++;
+  Object.assign(state,normalizeFont({...state,fontFamily:$('fontFamily').value}));
+  state.fontFix = true;
+  applyStateToUI();
+  void persistAndNotify();
+});
+$('fontWeight').addEventListener('change', () => {
+  state.fontWeight = Number($('fontWeight').value);
+  updateFontUI();
+  void persistAndNotify();
+});
+$('uploadFont').addEventListener('click', () => $('fontFile').click());
+$('fontFile').addEventListener('change', async () => {
+  const file = $('fontFile').files[0];
+  if (!file) return;
+  const run = ++uploadRevision;
+  $('uploadFont').disabled = true;
+  try {
+    const record = await readFontFile(file);
+    if (run !== uploadRevision) return;
+    try { await chrome.storage.local.set({[CUSTOM_FONT_KEY]:record}); }
+    catch { throw Error('فونت روی این دستگاه ذخیره نشد. دوباره تلاش کنید.'); }
+    customFont = record;
+    if (run !== uploadRevision) return;
+    Object.assign(state,{fontFamily:'custom',fontWeight:400,fontFix:true});
+    applyStateToUI();
+    await persistAndNotify();
+  } catch (error) { if (run === uploadRevision) setStatus(error.message || 'فونت ذخیره نشد. دوباره تلاش کنید.','error'); }
+  finally { $('fontFile').value = ''; $('uploadFont').disabled = false; }
+});
+$('removeFont').addEventListener('click', async () => {
+  uploadRevision++;
+  try {
+    await chrome.storage.local.remove(CUSTOM_FONT_KEY);
+    customFont = null;
+    if (state.fontFamily === 'custom') Object.assign(state,{fontFamily:'iransans',fontWeight:500});
+    applyStateToUI();
+    void persistAndNotify();
+  } catch { setStatus('فونت حذف نشد. دوباره تلاش کنید.','error'); }
+});
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
@@ -183,7 +257,7 @@ async function checkAccessStatus() {
     const granted = await chrome.permissions.contains({ origins: HOST_ORIGINS });
     if (revision !== currentRevision) return;
     if (!granted) setStatus('دسترسی افزونه به سایت‌ها را فعال کنید.', 'warn');
-    else if (platform) setStatus(`آماده برای ${platform[0]}؛ تغییرها خودکار ذخیره می‌شوند.`, 'ok');
+    else if (platform) setStatus('');
     else setStatus('برای استفاده، ChatGPT، Gemini یا Claude را باز کنید.');
   } catch {
     if (revision === currentRevision) setStatus('تنظیمات آماده است؛ بررسی تب باز ممکن نشد.', 'warn', checkAccessStatus);
@@ -195,6 +269,10 @@ async function init() {
   try {
     const saved = await chrome.storage.sync.get([...Object.keys(DEFAULT_STATE), ...LEGACY_KEYS]);
     state = normalizeState(saved);
+    try {
+      const local = await chrome.storage.local.get(CUSTOM_FONT_KEY);
+      customFont = validCustomFont(local[CUSTOM_FONT_KEY]) ? local[CUSTOM_FONT_KEY] : null;
+    } catch { /* Built-in fonts remain available when local storage fails. */ }
     for (const key of ['responseDir', 'composerDir']) {
       if (!['rtl', 'ltr', 'auto'].includes(state[key])) state[key] = DEFAULT_STATE[key];
     }

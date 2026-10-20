@@ -1,0 +1,27 @@
+{
+  "vazirmatn": {
+    "commit": "6e553e33489a8f9dfaccc76860a2e3f3c1e66de7",
+    "files": {
+      "fonts/webfonts/Vazirmatn[wght].woff2": "Vazirmatn-Variable.woff2",
+      "OFL.txt": "licenses/Vazirmatn-OFL.txt"
+    }
+  },
+  "shabnam-font": {
+    "commit": "5283d80e0118d9d4439b1208e9b912588e563d06",
+    "files": {
+      "dist/Shabnam.woff2": "Shabnam.woff2",
+      "dist/Shabnam-Thin.woff2": "Shabnam-Thin.woff2",
+      "dist/Shabnam-Light.woff2": "Shabnam-Light.woff2",
+      "dist/Shabnam-Medium.woff2": "Shabnam-Medium.woff2",
+      "dist/Shabnam-Bold.woff2": "Shabnam-Bold.woff2",
+      "LICENSE": "licenses/Shabnam-OFL.txt"
+    }
+  },
+  "sahel-font": {
+    "commit": "81ea305068b028ce311807c574fef50f3d4e2c54",
+    "files": {
+      "dist/Sahel-VF.woff2": "Sahel-Variable.woff2",
+      "LICENSE": "licenses/Sahel-OFL.txt"
+    }
+  }
+}

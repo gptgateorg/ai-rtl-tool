@@ -14,6 +14,29 @@ const URLS = [
   'https://claude.ai/*'
 ];
 const ALLOWED_DOMAINS = ['t.me', 'telegram.me'];
+let exportQueue = Promise.resolve();
+
+async function openExport(payload, sender) {
+  const source = new URL(sender.url || sender.tab?.url || '');
+  if (source.protocol !== 'https:' || !['chatgpt.com','chat.openai.com'].includes(source.hostname)) throw Error('Unsupported source');
+  if (!payload || !['response','conversation'].includes(payload.scope)
+      || !Array.isArray(payload.messages) || !payload.messages.length || payload.messages.length>500
+      || payload.messages.some(m=>!['user','assistant'].includes(m.role)||typeof m.html!=='string')
+      || JSON.stringify(payload).length>2*1024*1024) throw Error('حجم گفتگو برای خروجی یک‌جا زیاد است؛ از پاسخ‌ها جداگانه خروجی بگیرید.');
+  const old = await chrome.storage.session.get(null);
+  const entries = Object.entries(old).filter(([k])=>k.startsWith('pdf:')).sort((a,b)=>b[1].createdAt-a[1].createdAt);
+  // Keep at most two recent previews; session data disappears when Chrome closes.
+  const expired = entries.filter(([,v],i)=>i>=1 || Date.now()-v.createdAt>30*60*1000).map(([k])=>k);
+  if (expired.length) await chrome.storage.session.remove(expired);
+  const id = crypto.randomUUID();
+  const key = `pdf:${id}`;
+  await chrome.storage.session.set({[key]:{
+    messages:payload.messages, scope:payload.scope, title:String(payload.title || 'گفتگو').slice(0,200),
+    boundaryReached:payload.boundaryReached===true, unstableIdentity:payload.unstableIdentity===true, createdAt:Date.now(),
+  }});
+  try { await chrome.tabs.create({url:chrome.runtime.getURL(`export.html#${id}`)}); }
+  catch (error) { await chrome.storage.session.remove(key); throw error; }
+}
 
 /* ── Helpers ── */
 
@@ -67,6 +90,11 @@ chrome.runtime.onInstalled.addListener(() => {
 /* ── Open links — with URL domain validation (S1/S2) ── */
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === 'gptgate:export-pdf') {
+    exportQueue = exportQueue.catch(()=>{}).then(()=>openExport(msg.payload,sender));
+    exportQueue.then(()=>sendResponse({ok:true}),error=>sendResponse({ok:false,error:error.message}));
+    return true;
+  }
   if (msg?.type === 'open-link' && typeof msg.url === 'string') {
     if (isAllowedDomain(msg.url)) {
       chrome.tabs.create({ url: msg.url });

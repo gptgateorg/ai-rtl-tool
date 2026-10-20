@@ -1,3 +1,4 @@
+import { createFontController, CUSTOM_FONT_KEY } from './fonts.js';
 import {
   DEFAULT_STATE,
   normalizeState,
@@ -504,7 +505,7 @@ export function initExtension(platformSelectors) {
       const logo = document.createElement('img');
       logo.className = 'gptgate-logo';
       try {
-        logo.src = chrome.runtime.getURL('images/logo.png');
+        logo.src = chrome.runtime.getURL('images/brand-mark.svg');
       } catch (_) {
         // Extension context invalidated or getURL failed
         logo.src = '';
@@ -863,86 +864,7 @@ export function initExtension(platformSelectors) {
     }, 120);
   }
 
-  /* ── Font injection constants ── */
-  const FONT_STYLE_ID = 'gptgate-font-style';
-  const FONT_FAMILY_NAME = 'IRANSansX';
-
-  function injectCustomFont() {
-    if (document.getElementById(FONT_STYLE_ID)) return;
-
-    try {
-      const fontUrl = chrome.runtime.getURL('fonts/IRANSansX-MediumD4.woff2');
-
-      const cssString = `
-        @font-face {
-          font-family: '${FONT_FAMILY_NAME}';
-          src: url('${fontUrl}') format('woff2');
-          font-weight: normal;
-          font-style: normal;
-          font-display: swap;
-        }
-
-        /* ── Apply font to ALL text ── */
-        html body.gptgate-use-font * {
-          font-family: '${FONT_FAMILY_NAME}', 'Vazirmatn', sans-serif !important;
-        }
-
-        /* ── Protect icon fonts explicitly ── */
-        html body.gptgate-use-font mat-icon,
-        html body.gptgate-use-font mat-icon[data-mat-icon-type="font"],
-        html body.gptgate-use-font mat-icon.mat-ligature-font,
-        html body.gptgate-use-font .lumi-symbols,
-        html body.gptgate-use-font .material-icons,
-        html body.gptgate-use-font .material-icons-outlined,
-        html body.gptgate-use-font .material-icons-extended,
-        html body.gptgate-use-font .material-icons-round,
-        html body.gptgate-use-font .material-icons-sharp,
-        html body.gptgate-use-font .material-icons-two-tone,
-        html body.gptgate-use-font .material-symbols-outlined,
-        html body.gptgate-use-font .material-symbols-rounded,
-        html body.gptgate-use-font .material-symbols-sharp,
-        html body.gptgate-use-font [class*="material-symbols"],
-        html body.gptgate-use-font .google-symbols,
-        html body.gptgate-use-font [class*="google-symbols"] {
-          font-family: 'Luminous Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons', 'Google Symbols', sans-serif !important;
-        }
-
-        /* ── Protect Claude icons explicitly ── */
-        html body.gptgate-use-font [data-cds="Icon"] {
-          font-family: var(--font-anthropicons, 'Anthropicons-Variable') !important;
-        }
-
-        /* ── Keep code blocks monospace ── */
-        html body.gptgate-use-font pre,
-        html body.gptgate-use-font pre *,
-        html body.gptgate-use-font code,
-        html body.gptgate-use-font code *,
-        html body.gptgate-use-font [class*="code-"],
-        html body.gptgate-use-font [class*="code-"] *,
-        html body.gptgate-use-font .hljs,
-        html body.gptgate-use-font .hljs * {
-          font-family: 'Courier New', Consolas, monospace !important;
-        }
-
-        /* ── Keep math blocks standard ── */
-        html body.gptgate-use-font .katex,
-        html body.gptgate-use-font .katex *,
-        html body.gptgate-use-font .katex-display,
-        html body.gptgate-use-font .katex-display *,
-        html body.gptgate-use-font .mjx-container,
-        html body.gptgate-use-font .mjx-container * {
-          font-family: KaTeX_Main, 'Times New Roman', serif !important;
-        }
-      `;
-
-      const style = document.createElement('style');
-      style.id = FONT_STYLE_ID;
-      style.textContent = cssString;
-      document.documentElement.appendChild(style);
-    } catch (err) {
-      console.warn('[GptGate] Failed to inject font style:', err);
-    }
-  }
+  const updateFont = createFontController(platformSelectors.SELECTORS);
 
   /* ── State management ── */
   let currentState = { ...DEFAULT_STATE };
@@ -955,7 +877,7 @@ export function initExtension(platformSelectors) {
     currentState = normalizeState({ ...currentState, ...state });
     const { responseDir, composerDir, mathFix, fontFix, claudeDarkSurface: nextClaudeDarkSurface } = currentState;
 
-    injectCustomFont();
+    void updateFont(currentState);
 
     // Toggle font class
     document.body?.classList.toggle('gptgate-use-font', !!fontFix);
@@ -1071,7 +993,7 @@ export function initExtension(platformSelectors) {
     try {
       if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
         chrome.storage.sync.get(
-          ['responseDir', 'composerDir', 'mathFix', 'fontFix', 'rtlResponses', 'rtlComposer', CLAUDE_DARK_SURFACE_KEY],
+          [...Object.keys(DEFAULT_STATE), 'rtlResponses', 'rtlComposer'],
           (state) => {
             if (isContextInvalidated()) return;
             applyState(state || {}, 'initial');
@@ -1089,8 +1011,10 @@ export function initExtension(platformSelectors) {
       if (typeof chrome !== 'undefined' && chrome?.storage?.onChanged) {
         chrome.storage.onChanged.addListener((changes, area) => {
           if (isContextInvalidated()) return;
+          if (area === 'local' && CUSTOM_FONT_KEY in changes) void updateFont(currentState, true);
           if (area !== 'sync') return;
           const upd = {};
+          for (const key of ['fontFamily','fontWeight']) if (key in changes) upd[key] = changes[key].newValue;
           if ('responseDir' in changes) upd.responseDir = changes.responseDir.newValue;
           if ('composerDir' in changes) upd.composerDir = changes.composerDir.newValue;
           if ('mathFix' in changes) upd.mathFix = changes.mathFix.newValue;

@@ -121,7 +121,7 @@ components:
 
 The GptGate Persian tool popup uses the established Windows settings controls, mint/deep-green semantic palette, solid rounded panels, IRANSansX files, and source motion curves. The result is a compact utility for Persian speakers working with mixed Persian, English, and mathematical text. The source-defined visual world is preserved rather than expanded into a dashboard.
 
-The implementation at gptgateorg/ai-rtl-tool, baseline 244006e, is authoritative for this document. The frozen Windows reference is tests/fixtures/windows-settings.css; its upstream location is ../gptgate-window/browser-v2/src/renderer/settings/popup.css. Popup composition and three direction choices are purposeful adaptations. Product scope and validation limits remain in PRODUCT.md, docs/popup-brief.md, and docs/popup-validation.md.
+The implementation at gptgateorg/ai-rtl-tool, baseline 244006e, is authoritative for this document. The frozen Windows reference is tests/fixtures/windows-settings.css; its upstream location is ../gptgate-window/browser-v2/src/renderer/settings/popup.css. Popup composition and three direction choices are purposeful adaptations. Product scope and current validation limits are in PRODUCT.md, docs/popup-brief.md, and docs/font-pdf-validation.md. The earlier popup-only phase and its numbers remain historical in docs/popup-validation.md. Later approved work adds conversation fonts, local PDF previews, and supplied Persian branding without replacing the Windows control world.
 
 **Key Characteristics:**
 - Windows switch, sun/moon artwork, capsule shape, and motion retained.
@@ -153,17 +153,17 @@ Mint and deep green carry the Windows identity across light and dark themes. Fro
 
 **Body and control font:** IRANSansX with a sans-serif fallback. Only the exact Windows Regular and Bold files are loaded from fonts/popup/, at weights 400 and 700. Both use font-display block; synthesis is disabled and the ss01 stylistic set is enabled.
 
-The frontmatter captures the implemented title, control-label, body, description, and segment roles. The brand subtitle uses 11px/1.7; status text is 11px, and the version is 10px. Structural section headings remain available to assistive technology while visually hidden. There is no display, metric, or account typography role. Keep the existing shared host-page font separate from the popup font files.
+The frontmatter captures the implemented title, control-label, body, description, and segment roles. The header now uses the supplied Persian wordmark rather than the earlier text title/subtitle. Status text is 11px, and the version is 10px. Structural section headings remain available to assistive technology while visually hidden. There is no display, metric, or account typography role. Keep selected conversation typography separate from the popup font files. The conversation catalog adds IRANSansX weights, Vazirmatn, Shabnam, Sahel, and a device-local custom face; only the selected text faces load on demand. See fonts/README.md for the catalog and provenance.
 
 ## Layout
 
-The popup is 390px wide with 12px body padding. Its header places a compact brand group opposite the theme switch, separated by a 12px gap and followed by 12px bottom spacing. The logo occupies 40px, includes a 6px inset, and sits on the deep feature background. The brand subtitle caps at 160px.
+The popup is 390px wide with 12px body padding. Its header places a compact brand group opposite the theme switch, separated by a 12px gap and followed by 12px bottom spacing. The supplied Persian wordmark fits a 190 × 62px box and is inverted in dark mode. It retains its original artwork and Persian alternative text.
 
 A disabled/busy fieldset during loading contains two panels separated by 10px: two direction groups, then reading preferences. Panels use 12px vertical and 18px inline padding; the reading panel uses 8px vertical padding. Direction groups are 12px apart, with 6px between label and track. Reading rows have a 56px minimum height, 8px block padding, and a 12px content/control gap.
 
 Each direction control uses three equal columns with a 72px minimum per option. The track keeps LTR physical ordering inside the Persian RTL popup: left, automatic, right. Its selected capsule occupies one third of the inner width, moving by 0%, 100%, or 200% of its own width. Do not mirror this physical order with the surrounding text.
 
-Ordinary controls fit within a 600px Chrome popup, with vertical scrolling available at enlarged text. Below 390px, width becomes fluid with a 320px minimum, panel inline padding drops to 14px, and the logo hides. The status row follows the panels; the footer contains the community action and an LTR version label. There is no fixed dashboard navigation.
+Ordinary controls fit within a 600px Chrome popup, with vertical scrolling available at enlarged text. Below 390px, width becomes fluid with a 320px minimum, panel inline padding drops to 14px, and the wordmark reduces to 156 × 52px. The native font disclosure expands within the reading panel; family and weight selects share two columns and the mixed-language sample wraps within a recessed surface. Expanded settings may scroll. The status row follows the panels; the footer contains the community action and an LTR version label. There is no fixed dashboard navigation.
 
 ## Elevation & Depth
 
@@ -173,13 +173,13 @@ Panels use the source light/dark card shadows recorded in the sidecar, with opaq
 
 ## Shapes
 
-Large rounded panels, full-pill tracks, circular thumbs, and a small rounded retry control form the implemented vocabulary. The source medium-radius token remains available but is not assigned to a new field component. The logo and retry control use small corners; panels use large corners. Focus outlines are 2px with a 3px offset. Direction options and retry/community actions have 44px minimum heights. Frontmatter component heights describe minimum targets where the source uses min-height.
+Large rounded panels, full-pill tracks, circular thumbs, and a small rounded retry control form the implemented vocabulary. Retry and upload controls use small corners; panels use large corners. The font sample uses the existing medium-radius source token; the supplied wordmark keeps its original silhouette. Focus outlines are 2px with a 3px offset. Direction options and retry/community actions have 44px minimum heights. Frontmatter component heights describe minimum targets where the source uses min-height.
 
 ## Components
 
 ### Direction selector
 
-Two named groups independently control AI responses and the message composer. Native buttons expose aria-pressed and descriptive titles. A 4px track inset encloses the source action-colored capsule; labels use bold 12px text and 6px 12px padding. Selected text uses on-action; hover uses normal text and pointer press scales to 0.96. The selector is a choice group rather than page navigation; there are no tabs, chips, or text-entry fields to document.
+Two named groups independently control AI responses and the message composer. Native buttons expose aria-pressed and descriptive titles. A 4px track inset encloses the source action-colored capsule; labels use bold 12px text and 6px 12px padding. Selected text uses on-action; hover uses normal text and pointer press scales to 0.96. The selector is a choice group rather than page navigation. Font family/weight choices use native selects in a disclosure, with visible focus and 44px minimum targets.
 
 The moving capsule preserves the Windows selection curve and 360ms cadence while expanding two equal cells to three. Pointer changes use interruptible transforms; initial restoration and keyboard actions set instant motion. Selection changes do not measure layout or animate width.
 
@@ -197,13 +197,30 @@ This theme affects only the popup. It starts from the system preference unless a
 
 ### Feedback and secondary actions
 
-A polite atomic live region describes reading, saving, saved/applied, missing access, unavailable tabs, and failures. A 6px dot supplies supplementary tone; text remains explicit. Error status and the retry label use the normal text token, preserving the approved contrast correction. Retry uses danger-soft, small corners, and a 44px minimum target; it retries the failed operation. The community action keeps its existing inline Telegram SVG, muted text, 150ms color/transform response, and 0.98 press scale.
+A polite atomic live region describes reading, saving, saved/applied, missing access, unavailable tabs, and failures. The idle ready sentence is removed; an empty status row is hidden. Action and failure feedback remains visible. A 6px dot supplies supplementary tone; text remains explicit. Error status and the retry label use the normal text token, preserving the approved contrast correction. Retry uses danger-soft, small corners, and a 44px minimum target; it retries the failed operation. The community action keeps its existing inline Telegram SVG, muted text, 150ms color/transform response, and 0.98 press scale.
+
+### Font and PDF extensions
+
+The font disclosure uses the existing panel, border, text, and focus vocabulary.
+Its Persian/English sample previews typography, not direction-engine behavior.
+Upload/removal uses small rounded actions and explanatory local-only text.
+Conversation typography targets message/composer text while protecting native
+controls, code, math, and icons; popup UI remains on the original Windows faces.
+
+ChatGPT PDF actions use scoped extension controls with 44px minimum targets,
+small corners, the established mint/ink palette, and source press response.
+Single-response actions attach to assistant messages; the conversation action
+collects the available branch after an explicit gesture. Cancel and progress
+feedback remain visible. A local preview presents content and collection/image
+limitations before native printing. Keep the document readable on white paper,
+with code isolated LTR and semantic MathML printed once. These scoped additions
+do not authorize a redesign of host-site controls or layouts.
 
 ### Motion and accessibility
 
 Shared fast timing is 150ms with the source brand easing where used. No continuous decorative animation or runtime animation dependency is present. Initial state and keyboard interactions disable transitions immediately. Reduced motion disables all transitions and animations; forced colors preserves system borders and selected Highlight/HighlightText treatment. Native buttons, labels, switches, disabled states, and visible focus remain the accessibility contract.
 
-For build, browser, motion-comparison, integration, and performance evidence, see docs/popup-validation.md. Those recorded checks use isolated supported-origin fixtures and are not live-site or Windows hardware acceptance. This documentation pass changes no runtime source and does not rerun build or browser checks.
+For current build, browser, motion, integration, PDF, and performance evidence, see docs/font-pdf-validation.md; docs/popup-validation.md preserves the initial port. Recorded checks use isolated supported-origin fixtures and are not live-site or Windows hardware acceptance. Documentation checks do not rerun runtime validation.
 
 ## Do's and Don'ts
 
@@ -217,6 +234,6 @@ For build, browser, motion-comparison, integration, and performance evidence, se
 
 ### Don't:
 - **Don't** introduce accounts, login, subscriptions, connection artwork, or account dashboards into this tool.
-- **Don't** redesign supported websites, change existing preference keys, or add a UI runtime for this popup.
+- **Don't** redesign supported websites or native controls, rename existing preference keys, or add a UI runtime. Approved font/PDF integrations remain narrowly scoped.
 - **Don't** load unused font weights or add animation loops, timers, or layout measurements for control motion.
 - **Don't** treat isolated fixture evidence as proof of current live-site compatibility or Windows hardware testing.
