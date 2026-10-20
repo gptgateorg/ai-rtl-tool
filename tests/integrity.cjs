@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
-const files=['src/claude/content.js','src/claude/selectors.js','src/gemini/content.js','src/gemini/selectors.js','fonts/IRANSansX-MediumD4.woff2'];
+// Claude/Gemini engines are now in scope; behavioral coverage lives in site-engines.cjs.
+const files=['src/claude/selectors.js','src/gemini/selectors.js','fonts/IRANSansX-MediumD4.woff2'];
 for(const file of files)assert.deepEqual(fs.readFileSync(path.join(root,file)),execFileSync('git',['show',`244006e:${file}`],{cwd:root}),`Out-of-scope modification: ${file}`);
 const dist=path.join(root,'dist');
 const manifest=JSON.parse(fs.readFileSync(path.join(dist,'manifest.json')));

@@ -49,6 +49,7 @@ export function initExtension(platformSelectors) {
     }
     if (handleResize) {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('transitionend', schedulePanelPlacementDebounced);
     }
     if (handleVisibilityChange) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -798,9 +799,6 @@ export function initExtension(platformSelectors) {
       });
       geminiObserver.observe(document.body, { childList: true, subtree: true });
 
-      setInterval(() => {
-        scheduleGeminiPlacement();
-      }, 2500);
     }
     if (isClaude) {
       schedulePanelPlacement();
@@ -817,12 +815,9 @@ export function initExtension(platformSelectors) {
       });
       claudeMutObs.observe(document.body, { childList: true, subtree: true });
 
-      // Fallback poll — the resize event / ResizeObserver can miss transitions
-      // (e.g. rapid window resizes), leaving the panel stuck over the composer.
-      setInterval(() => {
-        if (isContextInvalidated()) return;
-        updatePanelPlacement();
-      }, 2000);
+      // Resize, body resize and DOM observers already schedule placement.
+      // No idle poll: late layout transitions are covered by their end event.
+      document.addEventListener('transitionend', schedulePanelPlacementDebounced);
     }
 
     try {
