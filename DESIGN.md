@@ -106,3 +106,7 @@ first strong character rather than isolated native Latin wrappers. Do not force
 every title into RTL or rewrite its text. The selected font family applies to
 titles; native weight remains independent of the conversation weight. This is
 scoped CSS with no new observers, timers or per-title DOM writes.
+
+Home reminders use right-aligned, plaintext-bidi text with the selected family
+at native weight. Target only the text span, for both simple button rows and
+rich rows with inline links. Keep icon, overlay-button and dismiss geometry.

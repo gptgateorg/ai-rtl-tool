@@ -31,6 +31,8 @@ controls without knowing RTL/LTR terminology.
 - ChatGPT sidebar conversation/project titles are right-aligned and use the
   selected font family at native interface weight. Preserve first-strong text
   direction, long-title marquee, sidebar placement and row controls.
+- Home reminder/suggestion text receives the same narrowly scoped alignment and
+  font-family correction; native icons, links and row actions remain in place.
 - No new permissions, host access, or polling. The DOCX converter is the one
   scoped runtime dependency: loaded only after choosing Word in the preview,
   never in supported-site content scripts or the popup.

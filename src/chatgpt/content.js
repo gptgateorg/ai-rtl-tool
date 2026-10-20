@@ -4,7 +4,7 @@
     const { syncExportUI, EXPORT_HEADER_SELECTOR } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
     const { MESSAGE_SELECTOR } = await import(chrome.runtime.getURL('src/shared/export-content.js'));
     const selectors = await import(chrome.runtime.getURL('src/chatgpt/selectors.js'));
-    const { SELECTORS, SIDEBAR_SELECTORS, SIDEBAR_TITLE_SELECTOR, PANEL_RIGHT, disableDirectionCSS } = selectors;
+    const { SELECTORS, SIDEBAR_SELECTORS, SIDEBAR_TITLE_SELECTOR, HOME_SUGGESTION_TEXT_SELECTOR, PANEL_RIGHT, disableDirectionCSS } = selectors;
     const core = await import(chrome.runtime.getURL('src/shared/core.js'));
     const { detectComposerDirection, detectTextDirection } = await import(chrome.runtime.getURL('src/shared/constants.js'));
     core.initExtension({ SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS });
@@ -427,6 +427,8 @@
         ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content]{unicode-bidi:plaintext}
         /* Native bdi wrappers hide an English prefix from dir=auto's first-strong detection. */
         ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content] :is([dir="auto"],bdi){unicode-bidi:normal;direction:inherit}
+        /* Home reminders can be button text or rich text over a separate native button. */
+        ${HOME_SUGGESTION_TEXT_SELECTOR}{text-align:right;unicode-bidi:plaintext}
         /* ChatGPT RTL Engine Styles */
         .claude-arabic-rtl {
           direction: rtl !important;

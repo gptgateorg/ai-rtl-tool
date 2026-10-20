@@ -9,7 +9,13 @@ ${title('english-only','gate design')}
 ${title('project-title','درس فارسی',true)}
 ${title('long-title','<bdi>GPTGate</bdi> '+ 'گفتگوی طولانی '.repeat(15))}
 </nav>`;
-const fixture=sidebar+`<main><aside><div data-markdown-text-style="assistant-message">Activity summary, not an answer</div></aside><div data-chatgpt-search-message-ids="user-1"><div data-user-message-bubble="true"><div>سلام، یک تست ساده</div></div></div><div data-chatgpt-selection-message-id="assistant-1"><div data-markdown-text-style="assistant-message" id="old"><div data-dil-message-id="assistant-1"><p>پاسخ قبلی</p></div></div></div><div data-chatgpt-selection-message-id="assistant-2"><div data-markdown-text-style="assistant-message" id="stream"><div data-dil-message-id="assistant-2"><p id="live">Hello</p><ul><li id="item">English</li></ul><pre><code id="code">const n = 1;</code></pre></div></div></div><div class="ProseMirror" contenteditable="true" role="textbox"></div><button id="native">Native</button></main>`;
+const reminders=`<style>#reminders{width:700px;max-width:100%;background:#161616;color:#ddd;font:400 16px/24px Arial}.reminder-row{position:relative}.reminder-content{display:flex;width:100%;align-items:center;gap:16px;padding:12px 44px 12px 8px;box-sizing:border-box;font:inherit;color:inherit;background:none;border:0;text-align:start}.reminder-icon{width:24px;flex:none}.reminder-text{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dismiss{position:absolute;right:8px;top:12px;width:24px}.overlay{position:absolute;inset:0;width:100%;background:none;border:0}.rich{position:relative;pointer-events:none}.rich a{pointer-events:auto;color:inherit}</style>
+<section class="group/home-suggestions" id="reminders">
+<div class="group/home-suggestion-list-item reminder-row"><button class="overlay" data-composer-mode="chat" id="reminder-open" aria-label="Open reminder"></button><div class="reminder-content rich" data-composer-mode="chat"><span class="reminder-icon" aria-hidden="true">↗</span><span class="truncate reminder-text" id="reminder-linked"><a href="https://example.test/pr/11" id="reminder-link">PR #11 ↗</a><span id="reminder-link-tail"> را بررسی کن</span></span></div><button class="dismiss" aria-label="Dismiss" id="reminder-dismiss">×</button></div>
+<div class="group/home-suggestion-list-item reminder-row"><button class="reminder-content" data-composer-mode="chat" id="reminder-plain-button"><span class="reminder-icon" aria-hidden="true">🛍️</span><span class="truncate reminder-text" id="reminder-persian"><span id="reminder-lead">هر وقت </span><span id="reminder-token">4K</span> تخفیف داشت، خبر بده</span></button><button class="dismiss" aria-label="Dismiss">×</button></div>
+<div class="group/home-suggestion-list-item reminder-row"><button class="reminder-content" data-composer-mode="chat"><span class="reminder-icon" aria-hidden="true">●</span><span class="truncate reminder-text" id="reminder-english">Catch me up on changes to my important files</span></button></div>
+</section>`;
+const fixture=sidebar+reminders+`<main><aside><div data-markdown-text-style="assistant-message">Activity summary, not an answer</div></aside><div data-chatgpt-search-message-ids="user-1"><div data-user-message-bubble="true"><div>سلام، یک تست ساده</div></div></div><div data-chatgpt-selection-message-id="assistant-1"><div data-markdown-text-style="assistant-message" id="old"><div data-dil-message-id="assistant-1"><p>پاسخ قبلی</p></div></div></div><div data-chatgpt-selection-message-id="assistant-2"><div data-markdown-text-style="assistant-message" id="stream"><div data-dil-message-id="assistant-2"><p id="live">Hello</p><ul><li id="item">English</li></ul><pre><code id="code">const n = 1;</code></pre></div></div></div><div class="ProseMirror" contenteditable="true" role="textbox"></div><button id="native">Native</button></main>`;
 (async()=>{
  const dist=path.join(root,'dist');const profile=fs.mkdtempSync(path.join(os.tmpdir(),'gptgate-live-structure-'));
  const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,args:[`--disable-extensions-except=${dist}`,`--load-extension=${dist}`]});const errors=[];
@@ -33,6 +39,28 @@ const fixture=sidebar+`<main><aside><div data-markdown-text-style="assistant-mes
   assert.ok(await page.locator('#live').evaluate(e=>getComputedStyle(e).fontFamily.includes('GPTGate IranSans')));
   assert.ok(!(await page.locator('#native').evaluate(e=>getComputedStyle(e).fontFamily)).includes('GPTGate'));
   await page.evaluate(()=>document.fonts.ready);
+  const reminderResult=await page.evaluate(()=>{
+   const rect=id=>document.getElementById(id).getBoundingClientRect();
+   const elements=[...document.querySelectorAll('#reminders .reminder-text')];
+   window.reminderActions=[];
+   for(const id of ['reminder-link','reminder-open','reminder-dismiss','reminder-plain-button'])document.getElementById(id).addEventListener('click',e=>{e.preventDefault();window.reminderActions.push(id);});
+   return{titles:elements.map(e=>({align:getComputedStyle(e).textAlign,bidi:getComputedStyle(e).unicodeBidi,font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight})),
+    persianOrder:rect('reminder-lead').left>=rect('reminder-token').right-1,
+    linkFirst:rect('reminder-link').right<=rect('reminder-link-tail').left+1,
+    iconX:document.querySelector('.reminder-icon').getBoundingClientRect().x,
+    buttonDirection:getComputedStyle(document.querySelector('#reminder-plain-button')).direction,
+    iconFont:getComputedStyle(document.querySelector('.reminder-icon')).fontFamily};
+  });
+  assert.equal(reminderResult.iconX,8);assert.equal(reminderResult.buttonDirection,'ltr');
+  assert.ok(reminderResult.persianOrder);assert.ok(reminderResult.linkFirst);
+  assert.ok(!reminderResult.iconFont.includes('GPTGate'));
+  for(const title of reminderResult.titles){assert.equal(title.align,'right');assert.equal(title.bidi,'plaintext');assert.equal(title.weight,'400');assert.ok(title.font.includes('IranSans'));}
+  await page.locator('#reminder-link').click();
+  await page.locator('#reminder-plain-button').click();
+  await page.locator('#reminder-dismiss').click();
+  assert.deepEqual(await page.evaluate(()=>window.reminderActions),['reminder-link','reminder-plain-button','reminder-dismiss']);
+  assert.equal(await page.locator('#reminder-link').getAttribute('href'),'https://example.test/pr/11');
+  await page.locator('#reminders').screenshot({path:path.join(output,'home-reminders-desktop.png')});
   const sidebarGeometry=()=>page.evaluate(()=>{
    const rect=s=>document.querySelector(s).getBoundingClientRect();
    return {x:rect('#app-shell-sidebar').x,width:rect('#app-shell-sidebar').width,
@@ -55,6 +83,9 @@ const fixture=sidebar+`<main><aside><div data-markdown-text-style="assistant-mes
   await page.evaluate(()=>document.fonts.ready);
   await page.locator('#app-shell-sidebar').screenshot({path:path.join(output,'sidebar-titles-desktop.png')});
   await page.setViewportSize({width:320,height:700});
+  assert.ok(await page.locator('#reminders').evaluate(e=>e.getBoundingClientRect().right<=innerWidth));
+  assert.equal(await page.locator('#reminder-persian').evaluate(e=>getComputedStyle(e).fontWeight),'400');
+  await page.locator('#reminders').screenshot({path:path.join(output,'home-reminders-320.png')});
   assert.deepEqual(await sidebarGeometry(),geometry,'Sidebar and buttons must retain their placement across narrow viewport/font changes');
   await page.locator('#app-shell-sidebar').screenshot({path:path.join(output,'sidebar-titles-320.png')});
   // Native marquee transforms still work; oversized titles start at their normal leading edge.
@@ -63,9 +94,12 @@ const fixture=sidebar+`<main><aside><div data-markdown-text-style="assistant-mes
   assert.equal(await page.locator('#long-title .track').evaluate(e=>getComputedStyle(e).transform),'matrix(1, 0, 0, 1, -40, 0)');
   await worker.evaluate(()=>chrome.storage.sync.set({fontFix:false}));
   await page.waitForFunction(()=>!getComputedStyle(document.querySelector('#english-first')).fontFamily.includes('GPTGate'));
+  assert.ok(!(await page.locator('#reminder-persian').evaluate(e=>getComputedStyle(e).fontFamily)).includes('GPTGate'));
   await worker.evaluate(()=>chrome.storage.sync.set({fontFix:true,fontFamily:'iransans',fontWeight:500}));
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('#english-first')).fontFamily.includes('IranSans'));
   await page.evaluate(()=>{const e=document.querySelector('#english-first');e.outerHTML=e.outerHTML.replace('GPTGate','AI');});
+  await page.locator('#reminder-persian').evaluate(e=>e.textContent='یادآور جدید برای GPTGate');
+  assert.equal(await page.locator('#reminder-persian').evaluate(e=>getComputedStyle(e).unicodeBidi),'plaintext');
   assert.ok((await sidebarGeometry()).englishPrefixFirst,'Dynamically replaced title must keep its English prefix without a rescan');
   await page.setViewportSize({width:1280,height:720});
   let world;

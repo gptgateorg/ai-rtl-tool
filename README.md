@@ -75,6 +75,10 @@ reading direction; an English prefix is not forced to the end by RTL layout.
 Native scrolling of long titles is preserved. Turning off font correction
 restores the native title font.
 
+Home-page reminders/suggestions also align their text right and use the selected
+font family at native weight. Natural bidi resolution keeps Persian, English,
+numbers and inline links in reading order without moving icons or row actions.
+
 ## Save ChatGPT content as PDF or Word
 
 1. Open the PDF menu in the ChatGPT conversation header. Choose the whole
