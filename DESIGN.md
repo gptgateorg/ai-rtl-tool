@@ -62,7 +62,7 @@ One 44px header trigger uses the same 13px/500 UI scale and a 20px document-down
 stroke icon. The trigger has no background or border, including hover/open states;
 color communicates hover/open state and keyboard focus retains its outline.
 The menu is at most 304px wide, with 12px viewport clearance, 12px corners, a
-one-pixel border and no decorative shadow. Two actions name their scope:
+one-pixel border and no decorative shadow. Two export actions name their scope:
 whole conversation or select a response. The supplied mark and the approved
 love attribution form a muted 12px/400 footer below the options, keeping the
 native 52px header clear. The standalone floating badge is removed on ChatGPT.
@@ -73,3 +73,26 @@ composer remain usable. Recycled or removed answer identities require reselectio
 Escape restores focus; keyboard and reduced-motion entry are immediate, pointer
 entry is 150ms opacity/4px translation. Listeners exist only while the menu or
 picker is open. There are no persistent controls under answers or new timers.
+
+The control's 52px header slot uses the native header surface color so scrolling
+text does not show through its transparent button. Export help is a third menu
+action; no repeated export buttons are added below responses.
+
+## First-use guidance and Word
+
+Popup tips sit in the normal flow directly after their target, with a small
+upward pointer, 12px inset/corners, 13px/500 heading and 12px body copy.
+Direction, fonts and math form three steps. Do not auto-open font settings.
+Skip, Next and Done have 44px targets; the footer Help action replays the guide.
+Automatic tips do not focus or scroll. Explicit navigation may bring the tip
+into view; Escape returns focus to Help.
+
+ChatGPT has one nonmodal export tip anchored below the header trigger. Defer it
+while the composer is focused, including during a pending storage response.
+Manual replay focuses its action and Escape returns to the export trigger.
+Use 150ms opacity/4px motion, immediate for keyboard/reduced motion. No looping
+animation, dimmer, polling or permanent guide listeners.
+
+The output preview keeps PDF as the primary action and Word as a neutral
+secondary action. Buttons wrap at narrow widths. Word preparation/error feedback
+stays in the preview; font-installation limits are stated after download.

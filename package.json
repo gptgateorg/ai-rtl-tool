@@ -5,12 +5,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "npm run build && node tests/integrity.cjs && node tests/popup.cjs && node tests/motion.cjs && node tests/extension.cjs && node tests/features.cjs && node tests/chatgpt-live-structure.cjs && node tests/pdf-controls.cjs",
+    "test": "npm run build && node tests/integrity.cjs && node tests/popup.cjs && node tests/motion.cjs && node tests/extension.cjs && node tests/features.cjs && node tests/chatgpt-live-structure.cjs && node tests/pdf-controls.cjs && node tests/tips.cjs && node tests/word-export.cjs",
     "test:performance": "node tests/performance.cjs && node tests/site-performance.cjs"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.23",
     "playwright": "1.55.0",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "docx": "9.13.0"
   }
 }

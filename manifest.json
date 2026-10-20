@@ -79,7 +79,8 @@
         "src/shared/export-content.js",
         "src/chatgpt/pdf-export.js",
         "fonts/licenses/*",
-        "images/brand-mark.svg"
+        "images/brand-mark.svg",
+        "src/shared/tips.js"
       ],
       "matches": [
         "https://chat.openai.com/*",

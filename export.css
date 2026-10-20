@@ -40,3 +40,9 @@ a{color:#2A7360;text-decoration:underline}
   p,li{orphans:3;widows:3}
   details{display:block}details>*{display:block}
 }
+
+.export-actions{display:flex;flex-wrap:wrap;gap:8px;margin-inline-start:auto}.export-actions button{margin:0;font-size:13px}
+button.secondary{background:#F4F7F6;color:#0D3B32;border:1px solid #B9C9C2}
+.word-status{max-width:900px;margin:0 auto 16px;padding:0 20px;font-size:12px}
+@media(max-width:650px){.export-actions{margin-inline-start:0}}
+@media print{.word-status{display:none!important}}

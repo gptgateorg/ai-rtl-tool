@@ -68,7 +68,7 @@ text, while native buttons, code, math, and icons retain their own rendering.
 The popup interface continues to use its Windows fonts. See
 [font files and provenance](fonts/README.md).
 
-## Save ChatGPT content as PDF
+## Save ChatGPT content as PDF or Word
 
 1. Open the PDF menu in the ChatGPT conversation header. Choose the whole
    conversation, or Select response: click an answer (or use Previous/Next),
@@ -77,7 +77,14 @@ The popup interface continues to use its Windows fonts. See
    Use Cancel, or scroll/touch/use a navigation key to stop it.
 3. Inspect the extension preview: check the message count, beginning/end,
    missing-image notes, and any incomplete-collection warning.
-4. Choose the print action and select Save as PDF in the browser dialog.
+4. Choose the PDF action and select Save as PDF in the browser dialog, or choose
+   Download Word to save a real `.docx` file locally.
+
+Word preserves editable text, lists, tables, code and supported MathML formulas.
+Fonts are not embedded: install the selected family on the device opening the
+file for consistent typography. Uploaded custom fonts use Tahoma in Word.
+Browser layout and Word pagination can differ; inspect the file before sharing.
+The converter loads only after choosing Word, not while browsing ChatGPT.
 
 Collection reads the currently available branch from the page DOM, with no
 conversation API. It restores the original scroll position if the route remains
@@ -86,6 +93,14 @@ hidden or unavailable history is not guaranteed. Only already loaded images
 whose pixels the browser permits are included, within the image-size cap;
 protected or large images become text placeholders. Native MathML is retained
 where available. See [the measured scope and limits](docs/font-pdf-validation.md).
+
+## First-use help
+
+New installations offer a short export tip in ChatGPT when the composer is not
+focused, and three arrow tips on the first popup opening: direction, fonts and
+math. Skip or finish to dismiss them. Replay from Help in the popup or Export
+help in the ChatGPT export menu. Completion is local to the device; updates do
+not restart the guide. No account is required.
 
 ## Storage and privacy
 
@@ -122,6 +137,8 @@ every remote website revision. Performance tests compare the original 244006e
 baseline with current code and write results under artifacts/qa/; measured
 increases and limits are reported in [current validation](docs/font-pdf-validation.md).
 The [earlier popup-port report](docs/popup-validation.md) preserves historical figures.
+See [Word and onboarding validation](docs/onboarding-word-validation.md) for the
+new export, first-install behavior, live Chrome checks and scoped performance comparison.
 
 ## Project structure
 
@@ -131,6 +148,8 @@ The [earlier popup-port report](docs/popup-validation.md) preserves historical f
 - src/chatgpt/: ChatGPT integration and scoped PDF actions.
 - src/gemini/ and src/claude/: existing supported-site integrations.
 - export.html / export.css / export.js: local preview and native print action.
+- export-docx.js: lazily loaded local Word conversion.
+- popup-tips.js / src/shared/tips.js: first-use guidance and replay.
 - fonts/: bundled faces, source mapping, and open-font licenses.
 - images/: supplied brand artwork; see [asset provenance](images/README.md).
 

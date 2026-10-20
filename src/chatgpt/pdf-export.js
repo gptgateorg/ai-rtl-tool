@@ -1,9 +1,11 @@
+import { createTip, claimTip } from '../shared/tips.js';
 import { captureMessage, collectConversation, messageElements, messageRole, messageIdentity, MESSAGE_SELECTOR } from '../shared/export-content.js';
 
 // One header control. Selection and export do no work until explicitly requested.
 export const EXPORT_HEADER_SELECTOR = '[data-app-shell-main-titlebar], [data-testid="thread-header-right-actions-container"], [data-testid="thread-header-right-actions"], #conversation-header-actions';
 const STYLE = `
 :host{display:block;flex:none;pointer-events:auto;direction:rtl;color-scheme:light dark;font:400 13px/20px GPTGateUI,sans-serif;font-synthesis:none;--logo-filter:brightness(0);--bg:#fff;--ink:#173D32;--muted:#52665E;--line:#DCE4E0;--hover:#EDF2F0;--accent:#145247}
+:host([data-placement="header"]){display:flex;align-items:center;height:52px;background:var(--color-surface,var(--token-main-surface-primary,var(--bg)))}
 :host([data-placement="fallback"]){margin:8px 16px}
 :host-context(.dark){--logo-filter:brightness(0) invert(1);--bg:#18231F;--ink:#E0EEE7;--muted:#A6B9AF;--line:#34463C;--hover:#26392F;--accent:#B1E7CC}
 @media(prefers-color-scheme:dark){:host-context(html:not(.light)){--logo-filter:brightness(0) invert(1);--bg:#18231F;--ink:#E0EEE7;--muted:#A6B9AF;--line:#34463C;--hover:#26392F;--accent:#B1E7CC}}
@@ -27,6 +29,8 @@ svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:
 const sheet = new CSSStyleSheet(); sheet.replaceSync(STYLE);
 let fontsRegistered = false;
 let control;
+let tipOffered = false;
+let tipClaim;
 const icon = paths => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
 const fileIcon = icon('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6m-3-3 3 3 3-3"/>');
 // Unknown renderers must reselect if text changes, rather than silently export a recycled node.
@@ -47,6 +51,7 @@ function createControl() {
     <div class="options">
       <button type="button" data-action="all">${fileIcon}<span class="option-copy">کل گفتگو<span class="hint">همهٔ پیام‌ها در یک فایل</span></span></button>
       <button type="button" data-action="select">${icon('<path d="m4 3 7 18 2-8 8-2z"/>')}<span class="option-copy">انتخاب پاسخ<span class="hint">یک پاسخ را از گفتگو انتخاب کنید</span></span></button>
+      <button type="button" data-action="help">راهنمای خروجی</button>
     </div>
     <div class="picker" hidden><p>روی پاسخ موردنظر کلیک کنید</p><span class="hint">یا با دکمه‌های زیر بین پاسخ‌ها جابه‌جا شوید.</span>
       <div class="navigation"><button type="button" data-action="prev" aria-label="پاسخ قبلی">${icon('<path d="m9 6 6 6-6 6"/>')}</button><span class="hint" id="selection-status" role="status">پاسخی انتخاب نشده</span><button type="button" data-action="next" aria-label="پاسخ بعدی">${icon('<path d="m15 6-6 6 6 6"/>')}</button></div>
@@ -57,12 +62,60 @@ function createControl() {
   </section>`;
   const $ = selector => root.querySelector(selector);
   const trigger = $('.trigger'), panel = $('.panel'), options = $('.options'), picker = $('.picker'), actions = $('.actions'), exportButton = $('[data-action="export"]'), status = $('.status');
+  let tip, pendingTipCleanup;
   let mode = 'menu', route = location.href, selected = null, selectedKey = '', active = null, selectionStyle;
   const say = text => { status.textContent = text; status.hidden = !text; };
   function position() {
     const rect = trigger.getBoundingClientRect();
     panel.style.left = `${Math.max(12,Math.min(innerWidth - panel.offsetWidth - 12,rect.right - panel.offsetWidth))}px`;
     panel.style.top = `${Math.max(12,Math.min(innerHeight - panel.offsetHeight - 12,rect.bottom + 8))}px`;
+  }
+  function closeTip() {
+    tip?.remove(); tip=null;
+    window.removeEventListener('resize',positionTip);
+    document.removeEventListener('keydown',dismissManualTip,true);
+  }
+  function dismissManualTip(event) {
+    if(event.key!=='Escape')return;
+    event.preventDefault();event.stopPropagation();closeTip();trigger.focus({preventScroll:true});
+  }
+  function positionTip() {
+    if(!tip)return;
+    const rect=trigger.getBoundingClientRect();
+    const left=Math.max(12,Math.min(innerWidth-tip.offsetWidth-12,rect.right-tip.offsetWidth));
+    tip.style.left=`${left}px`;
+    tip.style.top=`${Math.max(12,Math.min(innerHeight-tip.offsetHeight-12,rect.bottom+12))}px`;
+    tip.style.setProperty('--tip-arrow',`${Math.max(16,Math.min(tip.offsetWidth-24,left+tip.offsetWidth-(rect.left+rect.width/2)))}px`);
+  }
+  function showTip(manual=false) {
+    close({focus:false}); closeTip();
+    tip=createTip({title:'خروجی از گفتگو',text:'از این دکمه، کل گفتگو یا فقط یک پاسخ را انتخاب کنید. در پیش‌نمایش می‌توانید PDF یا Word بگیرید.',
+      onNext:()=>{closeTip();if(manual)trigger.focus({preventScroll:true});},onClose:()=>{closeTip();if(manual)trigger.focus({preventScroll:true});}});
+    tip.popover='auto';
+    tip.style.cssText='position:fixed;inset:auto;margin:0;width:288px;max-width:calc(100vw - 24px);overflow:visible';
+    root.append(tip);tip.showPopover();positionTip();
+    const current=tip;
+    current.addEventListener('toggle',()=>{if(!current.matches(':popover-open')&&tip===current)closeTip();});
+    window.addEventListener('resize',positionTip);
+    if(manual){document.addEventListener('keydown',dismissManualTip,true);tip.querySelector('[data-tip-next]').focus({preventScroll:true});}
+  }
+  function offerTip() {
+    if(tipOffered||pendingTipCleanup)return;
+    const busy=()=>document.activeElement?.matches('textarea,input,[contenteditable="true"]') || active || panel.matches(':popover-open');
+    const check=async()=>{
+      if(document.visibilityState!=='visible'||!host.isConnected||busy())return;
+      tipClaim ||= claimTip('pdf');
+      const show = await tipClaim;
+      if(tipOffered || !host.isConnected)return;
+      if(!show){tipOffered=true;pendingTipCleanup?.();return;}
+      // Typing may start while the worker/storage responds; retain the claim until safe.
+      if(document.visibilityState!=='visible'||busy())return;
+      tipOffered=true;pendingTipCleanup?.();showTip();
+    };
+    const afterFocus=()=>queueMicrotask(check);
+    pendingTipCleanup=()=>{document.removeEventListener('visibilitychange',check);document.removeEventListener('focusout',afterFocus);pendingTipCleanup=null;};
+    document.addEventListener('visibilitychange',check);document.addEventListener('focusout',afterFocus);
+    void check();
   }
   function clearSelection() {
     selected?.removeAttribute('data-gptgate-pdf-selected'); selected = null; selectedKey = '';
@@ -144,6 +197,7 @@ function createControl() {
   }
   root.addEventListener('pointerdown',()=>delete host.dataset.keyboard);
   trigger.addEventListener('click',event=>{
+    closeTip();
     host.toggleAttribute('data-keyboard',event.detail === 0);
     if (panel.matches(':popover-open')) { close(); return; }
     route = location.href; show('menu'); $('[data-action="all"]').focus({preventScroll:true});
@@ -154,7 +208,8 @@ function createControl() {
   root.addEventListener('click',event=>{
     const action = event.target.closest('button')?.dataset.action;
     if (!action) return;
-    if (action === 'cancel') close();
+    if (action === 'help') showTip(true);
+    else if (action === 'cancel') close();
     else if (action === 'all') void runExport(null);
     else if (action === 'export') void runExport(selected);
     else if (action === 'select') {
@@ -171,8 +226,8 @@ function createControl() {
       select(answers[index < 0 ? (action==='next'?0:answers.length-1) : Math.max(0,Math.min(answers.length-1,index+(action==='next'?1:-1)))],true);
     }
   });
-  return {host,dispose:()=>close({focus:false}),refresh:()=>{
-    if (route !== location.href) { close({focus:false}); route = location.href; }
+  return {host,offerTip,dispose:()=>{pendingTipCleanup?.();closeTip();close({focus:false});},refresh:()=>{
+    if (route !== location.href) { closeTip();close({focus:false}); route = location.href; }
     else if (mode === 'select' && selected && !validSelection()) { clearSelection(); say('پاسخ تغییر کرده؛ دوباره انتخاب کنید.'); }
   }};
 }
@@ -189,4 +244,5 @@ export function syncExportUI() {
     control.host.dataset.placement = anchor ? 'header' : 'fallback';
     parent.prepend(control.host);
   }
+  control.offerTip();
 }

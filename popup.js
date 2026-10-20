@@ -1,3 +1,4 @@
+import { setupTips } from './popup-tips.js';
 import { DEFAULT_STATE, normalizeState, HOST_ORIGINS, LEGACY_KEYS } from './src/shared/constants.js';
 import { FONT_CATALOG, WEIGHT_LABELS, CUSTOM_FONT_KEY, fontCSS, normalizeFont, readFontFile, validCustomFont } from './src/shared/fonts.js';
 
@@ -283,6 +284,7 @@ async function init() {
       if (!['rtl', 'ltr', 'auto'].includes(state[key])) state[key] = DEFAULT_STATE[key];
     }
     applyStateToUI();
+    if (!initialized) setupTips();
     initialized = true;
     $('settings').disabled = false;
     $('settings').setAttribute('aria-busy', 'false');

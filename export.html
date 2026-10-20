@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>پیش‌نمایش PDF گفتگو</title><link rel="stylesheet" href="export.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>پیش‌نمایش خروجی گفتگو</title><link rel="stylesheet" href="export.css"></head>
 <body>
   <header class="toolbar">
     <img src="images/brand-fa.svg" width="150" height="49" alt="جی‌پی‌تی گیت">
-    <div><h1>پیش‌نمایش PDF</h1><p>در پنجرهٔ چاپ، مقصد را روی «Save as PDF» بگذارید.</p></div>
-    <button id="print" type="button" disabled>ذخیره به‌صورت PDF</button>
+    <div><h1>پیش‌نمایش خروجی</h1><p>برای PDF، در پنجرهٔ چاپ مقصد را روی «Save as PDF» بگذارید.</p></div>
+    <div class="export-actions"><button id="print" type="button" disabled>ذخیره به‌صورت PDF</button><button id="word" class="secondary" type="button" disabled>دانلود Word (.docx)</button></div>
   </header>
   <aside id="notice" role="status">در حال آماده‌سازی گفتگو…</aside>
+  <p id="wordStatus" class="word-status" role="status" hidden></p>
   <main id="document"><header class="document-heading"><h2 id="title"></h2><p id="meta"></p></header><div id="messages"></div></main>
   <script type="module" src="export.js"></script>
 </body>

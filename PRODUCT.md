@@ -18,15 +18,19 @@ controls without knowing RTL/LTR terminology.
 - Existing math correction and Claude-only dark-surface preference.
 - Conversation font family/weight selection: IRANSansX, Vazirmatn, Shabnam,
   Sahel, or a locally uploaded font, with an in-popup sample.
-- ChatGPT-only PDF previews for an assistant response or the currently available
-  conversation branch; the user finishes through the browser's native print UI.
+- ChatGPT-only local previews for an assistant response or the currently available
+  conversation branch; PDF uses native print and Word downloads a real DOCX file.
+- First-install contextual guidance for PDF export and popup preferences, with
+  skip and replay. Updates preserve completion and do not restart onboarding.
 - No GptGate account, login, subscription, conversation API, or export server.
 - Existing preferences retain their Chrome Sync keys. New family/weight choices
   also use Sync; uploaded font bytes stay in chrome.storage.local on that device.
 - Approved feature work extends the initial popup-only port to narrowly scoped
   message/composer fonts, ChatGPT export controls, local preview handling, and
   supplied Persian brand assets. It does not authorize a supported-site redesign.
-- No new permissions, host access, runtime dependencies, or polling.
+- No new permissions, host access, or polling. The DOCX converter is the one
+  scoped runtime dependency: loaded only after choosing Word in the preview,
+  never in supported-site content scripts or the popup.
 - Fonts load on demand. Control motion remains interruptible and respects reduced
   motion; performance claims must identify the measured fixture and limits.
 
