@@ -196,10 +196,12 @@ async function notifyTabs(snapshot, currentRevision) {
       return;
     }
     const applied = await Promise.all(targets.map((tab) => sendStateToTab(tab, snapshot, currentRevision)));
-    if (applied.every(Boolean)) status('ذخیره شد و روی تب‌های باز اعمال شد.', 'ok');
+    if (applied.every(Boolean)) status('');
     else status('ذخیره شد؛ برای اعمال، تب سایت را تازه کنید.', 'warn', persistAndNotify);
   } catch {
     status('ذخیره شد؛ ارتباط با تب‌ها برقرار نشد.', 'warn', persistAndNotify);
+  } finally {
+    if (revision === currentRevision) $('settings').setAttribute('aria-busy', 'false');
   }
 }
 
@@ -208,18 +210,22 @@ async function persistAndNotify() {
   revision += 1;
   if (saving) return;
   saving = true;
+  $('settings').setAttribute('aria-busy', 'true');
   while (pendingSave) {
     pendingSave = false;
     const snapshot = { ...state };
     const currentRevision = revision;
-    setStatus('در حال ذخیره…');
+    setStatus('');
     try {
       await chrome.storage.sync.set(snapshot);
       // Migration cleanup is best-effort; a saved modern preference remains valid.
       try { await chrome.storage.sync.remove(LEGACY_KEYS); } catch { /* Retry on the next save. */ }
       if (!pendingSave) void notifyTabs(snapshot, currentRevision);
     } catch {
-      if (!pendingSave) setStatus('تنظیمات ذخیره نشد. دوباره تلاش کنید.', 'error', persistAndNotify);
+      if (!pendingSave) {
+        setStatus('تنظیمات ذخیره نشد. دوباره تلاش کنید.', 'error', persistAndNotify);
+        $('settings').setAttribute('aria-busy', 'false');
+      }
     }
   }
   saving = false;

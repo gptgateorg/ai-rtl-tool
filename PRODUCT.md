@@ -32,11 +32,12 @@ controls without knowing RTL/LTR terminology.
 
 ## Brand commitments
 
-Windows settings remain the authority for popup tokens, control geometry,
-typography, and motion. The popup uses the supplied Persian wordmark; the
+Windows settings supply the brand and sun/moon artwork. The user-approved
+compact refinement supersedes their exact geometry: 13px/500 labels, a 4px
+spacing scale, understated borders and 150ms pointer feedback. The popup uses the supplied Persian wordmark; the
 floating control uses the supplied standalone mark. Asset provenance is recorded
 in fonts/README.md and images/README.md. The popup interface keeps its Windows
-Regular/Bold faces; conversation font choices are a separate user preference.
+Regular/Medium faces; conversation font choices are a separate user preference.
 
 ## Evidence
 
@@ -49,7 +50,7 @@ current feature validation and limits are in docs/font-pdf-validation.md.
 ## Accessibility
 
 Persian labels, native controls, visible focus, reduced motion, forced colors,
-and truthful status/recovery messages. The idle ready sentence is omitted;
+and truthful status/recovery messages. Idle ready and successful-save sentences are omitted;
 loading, save, warning, and error feedback remains. Font changes preserve native
 site controls, code, mathematical notation, and icons. PDF previews expose
 incomplete-collection and image limitations before the user prints.

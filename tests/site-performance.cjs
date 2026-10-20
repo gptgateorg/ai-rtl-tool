@@ -35,8 +35,8 @@ async function measure(baseline){
  for(let i=0;i<5;i++)for(const name of i%2?['current','baseline']:['baseline','current'])samples[name].push(await measure(name==='baseline'));
  const summary=Object.fromEntries(Object.entries(samples).map(([name,rows])=>[name,Object.fromEntries(['idleTaskMs','streamTaskMs','streamLayoutMs','frameP95Ms'].map(k=>[k,+median(rows.map(r=>r[k])).toFixed(3)]))]));
  fs.writeFileSync(path.join(output,'site-performance.json'),JSON.stringify({method:'5 alternating pairs in isolated MV3 Chromium; 40 messages; 1.2s idle; 60 streamed updates; medians',summary,samples},null,2));console.log(JSON.stringify(summary,null,2));
- assert.ok(summary.current.idleTaskMs<summary.baseline.idleTaskMs+5,'Site idle regression');
- assert.ok(summary.current.streamTaskMs<summary.baseline.streamTaskMs*1.35+10,'Site streaming regression');
+ assert.ok(summary.current.idleTaskMs<summary.baseline.idleTaskMs+2,'Site idle regression');
+ assert.ok(summary.current.streamTaskMs<summary.baseline.streamTaskMs*1.10+2,'Site streaming regression');
  assert.ok(summary.current.frameP95Ms<=summary.baseline.frameP95Ms+5,'Site frame regression');
  console.log('PASS site idle/streaming budgets and unused-font loading checks (synthetic fixture).');
 })().catch(e=>{console.error(e);process.exitCode=1});

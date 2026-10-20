@@ -1,4 +1,4 @@
-import { captureMessage, collectConversation, messageElements } from '../shared/export-content.js';
+import { captureMessage, collectConversation, messageElements, messageRole } from '../shared/export-content.js';
 
 const STYLE = `
 :host{display:block;direction:rtl;margin-block:8px;color-scheme:light dark}
@@ -70,7 +70,7 @@ export function syncExportUI() {
   if (!messages.length) { existing?.remove(); return; }
   if (main && !existing) main.prepend(createTools(null));
   for (const message of messages) {
-    if (message.dataset.messageAuthorRole !== 'assistant') {
+    if (messageRole(message) !== 'assistant') {
       message.querySelector(':scope > gptgate-export-tools')?.remove();
       continue;
     }

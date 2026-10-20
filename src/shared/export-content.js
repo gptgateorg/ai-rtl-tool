@@ -90,13 +90,19 @@ export function captureMessage(element) {
   const source = element;
   const wrapper = document.createElement('div');
   wrapper.append(safeContent(source));
-  return { role: element.dataset.messageAuthorRole, html: wrapper.innerHTML };
+  return { role: messageRole(element), html: wrapper.innerHTML };
 }
 
-export const MESSAGE_SELECTOR = '[data-message-author-role="user"],[data-message-author-role="assistant"]';
+export const MESSAGE_SELECTOR = '[data-message-author-role="user"],[data-message-author-role="assistant"],[data-markdown-text-style="assistant-message"],[data-user-message-bubble]';
+export function messageRole(element) {
+  return element.dataset.messageAuthorRole || (element.hasAttribute('data-user-message-bubble') ? 'user' : 'assistant');
+}
 export function messageElements(root = document) {
   return [...root.querySelectorAll(MESSAGE_SELECTOR)].filter(node => {
     if (node.parentElement?.closest(MESSAGE_SELECTOR) || node.closest('[hidden],[aria-hidden="true"],[inert]')) return false;
+    // The new renderer also uses this style for activity/thinking summaries.
+    if (node.matches('[data-markdown-text-style]') && !node.dataset.messageAuthorRole
+      && !node.closest('[data-chatgpt-selection-conversation-id], [data-chatgpt-selection-message-id]')) return false;
     if (!node.checkVisibility) return true;
     if (node.checkVisibility({visibilityProperty:true})) return true;
     // display:contents wrappers have no box, but their message children do.
@@ -132,10 +138,14 @@ export async function collectConversation({signal, progress = ()=>{}, maxMs = 20
   const snapshot = () => {
     for (const element of messageElements()) {
       if (!check()) { limited = true; break; }
-      const stable = element.getAttribute('data-message-id') || element.closest('[data-testid^="conversation-turn-"]')?.getAttribute('data-testid');
+      const stable = element.getAttribute('data-message-id')
+        || element.closest('[data-chatgpt-selection-message-id]')?.getAttribute('data-chatgpt-selection-message-id')
+        || element.closest('[data-chatgpt-search-message-ids]')?.getAttribute('data-chatgpt-search-message-ids')
+        || element.querySelector('[data-dil-message-id]')?.getAttribute('data-dil-message-id')
+        || element.closest('[data-testid^="conversation-turn-"]')?.getAttribute('data-testid');
       if (!stable) unstableIdentity = true;
       if (!nodeKeys.has(element)) nodeKeys.set(element,`node-${++nextKey}`);
-      const key = `${element.dataset.messageAuthorRole}:${stable || nodeKeys.get(element)}`;
+      const key = `${messageRole(element)}:${stable || nodeKeys.get(element)}`;
       if (!ordered.has(key) && ordered.size >= 500) { limited = true; break; }
       const record = captureMessage(element);
       const nextBytes = bytes - (ordered.has(key) ? JSON.stringify(ordered.get(key)).length : 0) + JSON.stringify(record).length;

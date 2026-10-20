@@ -7,7 +7,7 @@ import {
 } from './constants.js';
 
 const STYLE_ID = 'gptgate-style-core';
-const FONT_ID = 'gptgate-font-link';
+const FONT_STYLE_ID = 'gptgate-font-style';
 const PANEL_ID = 'gptgate-floating-panel';
 const PANEL_STYLE_ID = 'gptgate-floating-panel-style';
 export function initExtension(platformSelectors) {
@@ -879,6 +879,8 @@ export function initExtension(platformSelectors) {
 
     void updateFont(currentState);
 
+    if (isChatGPT) document.body?.classList.add('gptgate-platform-chatgpt');
+
     // Toggle font class
     document.body?.classList.toggle('gptgate-use-font', !!fontFix);
 
@@ -931,6 +933,31 @@ export function initExtension(platformSelectors) {
       setClaudeDarkSurface(true);
     }
 
+    if (isChatGPT) {
+      // Hydration can replace body or reset its class attribute after document_start.
+      const stateObserver = new MutationObserver(() => {
+        if (isContextInvalidated()) { stateObserver.disconnect(); return; }
+        const body = document.body;
+        const expected = ['gptgate-platform-chatgpt', `gptgate-${currentState.responseDir}-response`, `gptgate-${currentState.composerDir}-composer`];
+        if (currentState.fontFix) expected.push('gptgate-use-font');
+        if (currentState.mathFix || currentState.responseDir === 'rtl' || currentState.composerDir === 'rtl') expected.push('gptgate-math-fix');
+        if (body && expected.some(name => !body.classList.contains(name))) applyState({}, 'body-state-restored');
+      });
+      let observedBody = document.body;
+      const observeBody = () => {
+        if (!document.body || document.body === observedBody) return;
+        observedBody = document.body;
+        stateObserver.disconnect();
+        if (document.body) {
+          stateObserver.observe(document.body, {attributes:true,attributeFilter:['class']});
+          applyState({}, 'body-replaced');
+        }
+      };
+      const bodyObserver = new MutationObserver(observeBody);
+      bodyObserver.observe(document.documentElement, {childList:true});
+      stateObserver.observe(document.body, {attributes:true,attributeFilter:['class']});
+    }
+
     applyState(DEFAULT_STATE, 'default-init');
     ensureFloatingPanel();
     updateFloatingPanelLayout();
@@ -981,7 +1008,7 @@ export function initExtension(platformSelectors) {
       const chatGPTMutObs = new MutationObserver(() => {
         schedulePanelPlacementDebounced();
       });
-      chatGPTMutObs.observe(document.body, { childList: true, subtree: true });
+      chatGPTMutObs.observe(document.documentElement, { childList: true, subtree: true });
 
       // Fallback poll — same rationale as Claude above.
       setInterval(() => {
@@ -1047,7 +1074,7 @@ export function initExtension(platformSelectors) {
     }
 
     watchDynamicContent({
-      root: document.body,
+      root: isChatGPT ? document.documentElement : document.body,
       onChange: (mutations) => {
         if (isContextInvalidated()) {
           handleInvalidation();
@@ -1088,6 +1115,7 @@ export function initExtension(platformSelectors) {
       el.id === PANEL_STYLE_ID ||
       el.id === STYLE_ID ||
       el.id === FONT_STYLE_ID ||
+      el.localName === 'gptgate-export-tools' ||
       !!el.closest?.(`#${PANEL_ID}`)
     );
   }

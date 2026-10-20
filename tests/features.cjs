@@ -4,7 +4,7 @@ const os=require('node:os');
 const path=require('node:path');
 const {chromium,root,output,open}=require('./harness.cjs');
 const ready=p=>p.waitForFunction(()=>!document.querySelector('#settings').disabled);
-const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('ذخیره شد'));
+const saved=p=>p.waitForFunction(()=>document.querySelector('#settings').getAttribute('aria-busy')==='false');
 (async()=>{
  const browser=await chromium.launch({channel:'chromium',headless:true});
  let checks=0;
@@ -41,7 +41,7 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textConte
   await page.waitForFunction(()=>typeof window.rejectFont==='function');
   await page.selectOption('#fontFamily','sahel');await saved(page);
   await page.evaluate(()=>rejectFont(Error('stale upload')));await page.waitForTimeout(50);
-  assert.ok((await page.locator('#status').textContent()).startsWith('ذخیره شد'));checks++;
+  assert.equal(await page.locator('#status').textContent(),'');checks++;
   assert.deepEqual(errors,[]);
   const moduleTests=await page.evaluate(async()=>{
    const {safeContent,collectConversation}=await import('/src/shared/export-content.js');
@@ -54,12 +54,22 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textConte
 
    const host=document.createElement('main');host.id='virtual';host.style.cssText='height:320px;overflow:auto;';
    const spacer=document.createElement('div');spacer.style.height='4800px';host.append(spacer);document.body.append(host);
+   let modern=false;
    const render=()=>{
     const start=Math.floor(host.scrollTop/160);
     spacer.replaceChildren();
     for(let i=start;i<Math.min(30,start+4);i++){
      const a=document.createElement('article');a.dataset.messageAuthorRole=i%2?'assistant':'user';a.dataset.messageId=String(i);a.style.cssText=`position:absolute;top:${i*160}px`;
-     a.textContent=i===8||i===12?'identical content':`Message ${i}`;spacer.append(a);
+     a.textContent=i===8||i===12?'identical content':`Message ${i}`;
+     if(modern){
+      delete a.dataset.messageAuthorRole;delete a.dataset.messageId;
+      if(i%2)a.dataset.markdownTextStyle='assistant-message';else a.dataset.userMessageBubble='true';
+      a.dataset.chatgptSelectionConversationId='fixture';
+      if(i%3===0)a.dataset.chatgptSelectionMessageId=String(i);
+      else if(i%3===1)a.dataset.chatgptSearchMessageIds=String(i);
+      else {const child=document.createElement('span');child.dataset.dilMessageId=String(i);child.textContent=a.textContent;a.replaceChildren(child);}
+     }
+     spacer.append(a);
     }
     if(start>=26)for(let i=30;i<32;i++){const hidden=document.createElement('article');hidden.hidden=true;hidden.dataset.messageAuthorRole='assistant';hidden.dataset.messageId=String(i);hidden.textContent=`Hidden ${i}`;spacer.append(hidden);}
    };
@@ -67,6 +77,8 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textConte
    const original=host.scrollTop;
    const result=await collectConversation({settleMs:20,maxMs:10000});
    const restored=host.scrollTop===original;
+   modern=true;render();
+   const modernResult=await collectConversation({settleMs:20,maxMs:10000});
    const abort=new AbortController();abort.abort();let cancelled=false;
    try{await collectConversation({signal:abort.signal});}catch(e){cancelled=e.name==='AbortError';}
    let capResult;host.scrollTop=0;render();
@@ -74,7 +86,7 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textConte
    host.remove();
    const many=document.createElement('main');many.innerHTML=Array.from({length:501},(_,i)=>`<article data-message-author-role="assistant" data-message-id="m${i}">Message ${i}</article>`).join('');document.body.append(many);
    const messageCap=await collectConversation({maxMs:5000,settleMs:20});many.remove();
-   return {sanitized,result,restored,cancelled,capResult,limitError,messageCap};
+   return {sanitized,result,modernResult,restored,cancelled,capResult,limitError,messageCap};
   });
   assert.ok(!/onclick|onerror|<script|<iframe|javascript:|<img|gptgate-export-tools|duplicate/.test(moduleTests.sanitized));
   assert.equal(moduleTests.limitError,true);assert.ok(moduleTests.sanitized.includes('<details open="">'));
@@ -82,6 +94,9 @@ const saved=p=>p.waitForFunction(()=>document.querySelector('#status').textConte
   assert.ok(moduleTests.sanitized.includes('<mfrac>'));assert.ok(moduleTests.sanitized.includes('const x'));
   assert.equal(moduleTests.result.messages.length,30);assert.equal(moduleTests.result.boundaryReached,true);
   assert.equal(moduleTests.result.messages.filter(m=>m.html==='identical content').length,2);
+  assert.equal(moduleTests.modernResult.messages.length,30);
+  assert.equal(moduleTests.modernResult.unstableIdentity,false);
+  assert.deepEqual(moduleTests.modernResult.messages.map(m=>({role:m.role,text:m.html.replace(/<[^>]*>/g,'')})),moduleTests.result.messages.map(m=>({role:m.role,text:m.html})));checks+=3;
   assert.equal(moduleTests.result.unstableIdentity,false);assert.equal(moduleTests.restored,true);assert.equal(moduleTests.cancelled,true);assert.equal(moduleTests.capResult.boundaryReached,false);checks+=10;
   await page.close();
   const missing=await open(browser,{state:{fontFamily:'custom',fontWeight:400}});await ready(missing.page);await missing.page.locator('summary').click();

@@ -1,5 +1,7 @@
 export const SELECTORS = {
   responses: [
+    '[data-markdown-text-style="assistant-message"]',
+    '[data-user-message-bubble]',
     '[data-message-author-role="assistant"]',
     '[data-message-author-role="user"]',
     '[data-testid="conversation-turn"]',

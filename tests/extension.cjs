@@ -34,7 +34,7 @@ const {chromium,root,output}=require('./harness.cjs');
   await popup.locator('#compLtr').click();
   await popup.locator('label.switch:has(#fontSwitch)').click();
   await popup.locator('label.switch:has(#mathSwitch)').click();
-  await popup.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('ذخیره شد'));
+  await popup.waitForFunction(()=>document.querySelector('#settings').getAttribute('aria-busy')==='false');
   for(const page of sites)await page.waitForFunction(()=>!document.body.classList.contains('gptgate-math-fix'));
   const saved=await worker.evaluate(()=>chrome.storage.sync.get(null));
   assert.equal(saved.responseDir,'ltr');assert.equal(saved.composerDir,'ltr');assert.equal(saved.fontFix,false);assert.equal(saved.mathFix,false);

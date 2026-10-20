@@ -1,6 +1,6 @@
 # Popup direction and reading contract
 
-Mode: Operate. Preserve the Windows control world while extending the existing
+Mode: Operate. Preserve the Windows brand and familiar interactions while extending the existing
 Persian utility with the features explicitly approved after the initial port.
 
 ## Approved scope
@@ -28,14 +28,18 @@ feedback. The Claude-only row remains contextual to Claude.
 
 ## Source mapping
 
-- Mint/Deep Ink tokens and popup IRANSansX 400/700: Windows settings reference.
-- Direction selector: source capsule expanded from two to three equal columns;
-  4px inset, 44px targets, 360ms curve, and source press scale.
-- Reading switch: source 64px geometry, 28px thumb travel and RTL reversal.
-- Theme switch: source sun/moon SVG, 100 × 52px geometry, 48px travel, 380ms curve.
-- Panels: opaque themed fills, 28px corners, and source soft shadow.
-- Wordmark and marks: supplied brand archive; provenance in ../images/README.md.
+- Mint/Deep Ink brand on quieter neutral surfaces.
+- Real IRANSansX 400/500 faces: 13px labels, 12px secondary text.
+- Direction selector: three columns, 44px targets, 4px selection inset.
+- Reading switch: 44px hit area, 24px visual height, 20px RTL thumb travel.
+- Theme switch: original sun/moon artwork, 64 by 44px hit area, 32px travel.
+- Panels: 16px insets, 12px corners, thin borders and no shadow.
+- Wordmark: supplied artwork at 132 by 44px.
+- Pointer motion: 150ms ease-out; keyboard and reduced motion remain immediate.
 - Conversation fonts: separate on-demand assets, not replacements for popup UI.
+
+The user's compact-scale refinement supersedes literal Windows geometry parity.
+Successful saves are silent, with errors/actionable warnings and retry retained.
 
 ## Motion and accessibility
 
@@ -48,7 +52,8 @@ feedback, keyboard focus, and reduced-motion treatment.
 
 ## Validation boundaries
 
-Keep token/geometry/motion comparisons against tests/fixtures/windows-settings.css.
+Keep tests/fixtures/windows-settings.css as historical evidence. Test the compact
+contract in tests/motion.cjs, including interruption and actual medium-font loading.
 Validate popup persistence/errors, local uploads/fallbacks, protected native UI,
 font loading, DOM sanitization, virtualized collection limits/cancel, actual PDF
 content, and real MV3 fixtures. Record performance with the test method and

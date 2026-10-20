@@ -5,9 +5,10 @@ separate scopes. No font is fetched from a remote CDN at runtime.
 
 ## Popup interface
 
-fonts/popup/IRANSansX-Regular.woff2 and IRANSansX-Bold.woff2 retain the Windows
-settings faces at weights 400 and 700. Popup UI stays on those faces; selecting
-a conversation family does not restyle the extension controls.
+The compact popup uses fonts/popup/IRANSansX-Regular.woff2 at 400 and
+fonts/IRANSansX-Medium.woff2 at 500, with synthesis disabled. The original
+Windows Bold file remains archived in fonts/popup/. Selecting a conversation
+family does not restyle the extension controls.
 
 ## Conversation catalog
 

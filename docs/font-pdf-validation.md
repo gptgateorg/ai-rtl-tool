@@ -1,3 +1,6 @@
+> Historical feature-phase evidence. Current installed Chrome, compact UI and CPU
+> regression results are in [live-chrome-validation.md](live-chrome-validation.md).
+
 # Font, PDF, and Persian branding validation
 
 ## Approved scope and phase

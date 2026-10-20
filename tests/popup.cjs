@@ -3,7 +3,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium,open,output}=require('./harness.cjs');
 const waitReady=page=>page.waitForFunction(()=>!document.querySelector('#settings').disabled && !document.querySelector('#status').textContent.includes('خواندن'));
-const waitSaved=page=>page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('ذخیره شد'));
+const waitSaved=page=>page.waitForFunction(()=>document.querySelector('#settings').getAttribute('aria-busy')==='false');
 (async()=>{
  const browser=await chromium.launch({channel:'chromium',headless:true});
  let checks=0;
@@ -99,6 +99,13 @@ const waitSaved=page=>page.waitForFunction(()=>document.querySelector('#status')
    await waitSaved(page);await page.waitForTimeout(250);
    assert.equal(await page.evaluate(()=>fixture.saved.responseDir),'ltr');assert.equal(await page.evaluate(()=>fixture.saved.composerDir),'rtl');
    for(const id of [1,2,3]){const last=await page.evaluate(id=>fixture.calls.filter(c=>c.name==='send'&&c.args.id===id).at(-1)?.args.msg.state,id);assert.equal(last.responseDir,'ltr');assert.equal(last.composerDir,'rtl');}checks+=5;await page.close();}
+  {const {page}=await open(browser);await waitReady(page);
+   await page.evaluate(()=>{const original=chrome.tabs.sendMessage;let first=true;chrome.tabs.sendMessage=(...args)=>{if(first){first=false;window.firstSendStarted=true;return new Promise(resolve=>window.releaseFirstSend=()=>resolve({ok:true}));}return original(...args);};});
+   await page.locator('#respLtr').click();await page.waitForFunction(()=>window.firstSendStarted);
+   await page.locator('#respAuto').click();await page.waitForFunction(()=>fixture.saved.responseDir==='auto');
+   await waitSaved(page);assert.equal(await page.locator('#status').textContent(),'');
+   await page.evaluate(()=>window.releaseFirstSend());await page.waitForTimeout(30);
+   assert.equal(await page.locator('#respAuto').getAttribute('aria-pressed'),'true');assert.equal(await page.locator('#status').textContent(),'');checks+=3;await page.close();}
   console.log(`PASS ${checks} popup checks: platforms, preferences, persistence, motion accessibility, error recovery, rapid input.`);
   fs.writeFileSync(path.join(output,'popup-results.json'),JSON.stringify({checks,passed:true},null,2));
  }finally{await browser.close();}
