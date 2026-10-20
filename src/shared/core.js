@@ -27,7 +27,7 @@ export function initExtension(platformSelectors) {
   const isChatGPT = window.location.hostname.includes('chatgpt.com') || window.location.hostname.includes('chat.openai.com');
   const isGemini = window.location.hostname.includes('gemini.google.com');
   const isClaude = window.location.hostname.includes('claude.ai');
-  let claudeDarkSurface = true;
+  let claudeDarkSurface = DEFAULT_STATE.claudeDarkSurface;
   const isContextInvalidated = () => {
     try {
       if (typeof chrome === 'undefined' || !chrome || !chrome.runtime || !chrome.runtime.id) {
@@ -758,7 +758,7 @@ export function initExtension(platformSelectors) {
     }
     if (isClaude) {
       document.body.classList.add('gptgate-platform-claude');
-      setClaudeDarkSurface(true);
+      setClaudeDarkSurface(DEFAULT_STATE.claudeDarkSurface);
     }
 
     if (isChatGPT) {

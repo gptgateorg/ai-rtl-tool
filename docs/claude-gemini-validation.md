@@ -173,3 +173,37 @@ was also reviewed. No dependency or host/permission expansion was introduced.
 
 Complete the existing public privacy-policy URL and store draft approval
 requirements in `store/README.md`. The live Gemini access blocker is resolved.
+
+## Claude composer appearance follow-up
+
+The previous black-surface CSS matched every `bg-surface` element and inline
+background, flattening the composer into the page. It also overwrote native
+color tokens with incompatible values. The replacement changes only dark page
+canvas tokens and leaves composer, button and popover surfaces intact.
+Native light mode is not overridden.
+
+The Claude option is now visible from every tab, with explicit help explaining
+that switching it off restores Claude's own appearance. Fresh installations
+default to native appearance; existing saved choices are preserved. Startup
+no longer enables black styling before loading the saved preference.
+
+Validation:
+
+- `npm test` passed, including 103 popup checks and the new native/dark/light
+  appearance assertions. After the final canvas-token adjustment, the build
+  and site-engine regression suite passed again.
+- Real Chrome confirmed the composer stays 768 × 48 px, radius 14 px,
+  background `rgb(32, 32, 31)` and identical controls in both modes. The page
+  changes from `rgb(21, 21, 21)` to `rgb(2, 2, 2)` independently.
+- The real Claude tab was left with the extension's black option **off**,
+  retaining Claude's own current dark theme, fonts and empty draft.
+- Popup screenshots were inspected at 320 px dark and 390 px light. A real
+  desktop screenshot could not be captured in this session; the real-site
+  appearance check used computed colors and element geometry.
+- No observer, timer or dependency was added. Both site engines still made
+  zero recurring document queries in the idle regression check. The CPU
+  measurements above predate this appearance change; no new OS CPU comparison
+  was performed for this CSS/settings fix.
+
+Evidence: `artifacts/qa/claude-appearance-live.json`,
+`claude-appearance-suite.log`, `claude-appearance-final-checks.log`.

@@ -24,8 +24,8 @@ p{margin:0;color:#3d6159;font-size:24px;line-height:1.9}
 .media img{display:block;max-width:100%;height:auto;border:1px solid #c6d6cf;border-radius:16px}
 .media small{font-size:15px;line-height:1.6;color:#3d6159;direction:rtl;text-align:center}
 footer{border-top:1px solid #bdcfc6;height:48px;padding-top:16px;display:flex;justify-content:space-between;align-items:center;direction:rtl;font-size:18px;color:#3d6159;flex:none}
-.hero{background:#103d33;color:#f4faf7}.hero .brand,.hero p,.hero footer,.hero .media small{color:#c0dbd0}.hero h1 b{color:#b5e8d6}.hero footer,.hero .detail{border-color:#45695d}.hero .media img{width:414px;border:0}
-.fonts .media img{width:452px}.fonts .copy{width:520px}.fonts .detail{line-height:2.1}
+.hero{background:#103d33;color:#f4faf7}.hero .brand,.hero p,.hero footer,.hero .media small{color:#c0dbd0}.hero h1 b{color:#b5e8d6}.hero footer,.hero .detail{border-color:#45695d}.hero .media img{width:390px;border:0}
+.fonts .media img{width:390px}.fonts .copy{width:520px}.fonts .detail{line-height:2.1}
 .export .stage{gap:36px}.export .media{width:744px}.export .copy{width:388px}.export h1{font-size:44px}.export p{font-size:22px}.export .media img{border-radius:12px}.export .detail{font-size:18px}
 .promo{width:440px;height:280px;background:#103d33;color:#f4faf7;padding:28px 32px;direction:rtl;text-align:right}
 .promo img{width:120px;height:40px;object-fit:contain;filter:invert(1)}.promo h1{font-size:30px;line-height:1.6;margin:18px 0 12px}.promo p{color:#c0dbd0;font-size:15px;line-height:1.6}
@@ -45,6 +45,8 @@ async function capture(page, name, html, size={width:1280,height:800}) {
     for(const el of document.querySelectorAll('.copy,.media,.brand,footer,.promo h1,.promo p')){
       const r=el.getBoundingClientRect();
       if(r.x<0||r.y<0||r.right>innerWidth+1||r.bottom>innerHeight+1||el.scrollWidth>el.clientWidth+1)issues.push(el.className||el.tagName);
+      const stage=el.closest('.stage')?.getBoundingClientRect();
+      if(stage&&(r.top<stage.top-1||r.bottom>stage.bottom+1))issues.push(`Stage overlap: ${el.className}`);
     }
     return issues;
   });

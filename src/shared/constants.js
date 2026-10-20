@@ -13,7 +13,7 @@ export const DEFAULT_STATE = {
   fontFix: true,
   fontFamily: 'iransans',
   fontWeight: 500,
-  claudeDarkSurface: true
+  claudeDarkSurface: false
 };
 
 export const CLAUDE_DARK_SURFACE_KEY = 'claudeDarkSurface';

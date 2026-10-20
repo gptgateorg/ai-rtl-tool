@@ -12,7 +12,8 @@ const waitSaved=page=>page.waitForFunction(()=>document.querySelector('#settings
    const {page,errors}=await open(browser,{theme,url:`https://${platform}/`});await waitReady(page);
    assert.equal(await page.locator('#respRtl').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('#compAuto').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.locator('#claudeThemeRow').isVisible(),platform==='claude.ai');
+   assert.equal(await page.locator('#claudeThemeRow').isVisible(),true);
+   assert.equal(await page.locator('#claudeThemeSwitch').isChecked(),false,'Native Claude appearance is the fresh-install default');
    for(const group of ['resp','comp'])for(const value of ['Ltr','Auto','Rtl']){
     await page.locator('#'+group+value).click();await waitSaved(page);
     assert.equal(await page.locator('#'+group+value).getAttribute('aria-pressed'),'true');
@@ -20,10 +21,10 @@ const waitSaved=page=>page.waitForFunction(()=>document.querySelector('#settings
    }
    assert.equal(await page.locator('#mathSwitch').isDisabled(),true);
    await page.locator('#respAuto').click();await page.locator('#compAuto').click();await waitSaved(page);
-   for(const id of ['mathSwitch','fontSwitch',...(platform==='claude.ai'?['claudeThemeSwitch']:[])]){
+   for(const id of ['mathSwitch','fontSwitch','claudeThemeSwitch']){
     await page.locator(`label.switch:has(#${id})`).click();await waitSaved(page);
-    assert.equal(await page.locator('#'+id).isChecked(),false);
-    await page.reload();await waitReady(page);assert.equal(await page.locator('#'+id).isChecked(),false);checks++;
+    assert.equal(await page.locator('#'+id).isChecked(),id==='claudeThemeSwitch');
+    await page.reload();await waitReady(page);assert.equal(await page.locator('#'+id).isChecked(),id==='claudeThemeSwitch');checks++;
    }
    // Popup-only theme never broadcasts or changes any content preference.
    const before=await page.evaluate(()=>({saved:{...fixture.saved},sends:fixture.calls.filter(c=>c.name==='send').length}));

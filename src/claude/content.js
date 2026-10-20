@@ -268,38 +268,13 @@
       const style = document.createElement('style');
       style.id = 'claude-rtl-guide-style';
       const claudeSurfaceCSS = `
-        /* Claude app surface color */
-        html.gptgate-claude-dark-surface,
-        html.gptgate-claude-dark-surface body,
-        html.gptgate-claude-dark-surface [data-theme] {
-          --bg-000: #020202 !important;
-          --bg-100: #020202 !important;
-          --bg-200: #020202 !important;
-          --bg-300: #020202 !important;
-          --background: #020202 !important;
-          --surface: #020202 !important;
-          --surface-primary: #020202 !important;
-          --surface-secondary: #020202 !important;
-        }
-
-        html.gptgate-claude-dark-surface,
-        html.gptgate-claude-dark-surface body {
-          background: #020202 !important;
-          background-color: #020202 !important;
-        }
-
-        html.gptgate-claude-dark-surface body > div,
-        html.gptgate-claude-dark-surface main,
-        html.gptgate-claude-dark-surface aside,
-        html.gptgate-claude-dark-surface nav,
-        html.gptgate-claude-dark-surface [role="main"],
-        html.gptgate-claude-dark-surface [class*="min-h-screen"],
-        html.gptgate-claude-dark-surface [class*="bg-bg-"],
-        html.gptgate-claude-dark-surface [class*="bg-surface"],
-        html.gptgate-claude-dark-surface [class*="bg-\\[var\\(--bg"],
-        html.gptgate-claude-dark-surface [style*="background"] {
-          background: #020202 !important;
-          background-color: #020202 !important;
+        /* Change only the dark page canvas. Native composer, buttons and
+           popovers keep their own surface tokens and geometry. */
+        html.gptgate-claude-dark-surface:is([data-mode="dark"], .dark):not([data-mode="light"]) {
+          --cds-surface-1: #020202 !important;
+          --cds-page-bg: #020202 !important;
+          --background-color-page: #020202 !important;
+          --bg-100: 0 0% 0.7843% !important;
         }
       `;
       style.textContent = `

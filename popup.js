@@ -260,7 +260,6 @@ async function checkAccessStatus() {
   try {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const platform = platformFor(tabs[0]?.url);
-    $('claudeThemeRow').hidden = platform?.[0] !== 'Claude';
     const granted = await chrome.permissions.contains({ origins: HOST_ORIGINS });
     if (revision !== currentRevision) return;
     if (!granted) setStatus('دسترسی افزونه به سایت‌ها را فعال کنید.', 'warn');
