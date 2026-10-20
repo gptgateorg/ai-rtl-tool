@@ -67,6 +67,7 @@ export function createFontController(selectors) {
     const scope = `:is(${[...selectors.responses,...selectors.composer].join(',')})`;
     const protectedNodes = 'pre,pre *,code,code *,kbd,kbd *,samp,samp *,math,math *,.katex,.katex *,mjx-container,mjx-container *,.mjx-container,.mjx-container *,svg,svg *,button,button *,mat-icon,mat-icon *,[data-cds="Icon"],[class*="material-"],[class*="google-symbols"],.lumi-symbols,[class*="code-"],[class*="code-"] *,.hljs,.hljs *';
     const text = `html body.gptgate-use-font :is(${scope},${scope} *):not(${protectedNodes})`;
+    const sidebar = selectors.sidebarTitles?.length ? `html body.gptgate-use-font :is(${selectors.sidebarTitles.join(',')})` : null;
     let style = document.getElementById('gptgate-font-style');
     if (!style) {
       style = document.createElement('style');
@@ -75,6 +76,7 @@ export function createFontController(selectors) {
     }
     style.textContent = `${faces}
       ${text}{font-family:"${family}",sans-serif!important}
-      ${text}:not(strong,strong *,b,b *,h1,h1 *,h2,h2 *,h3,h3 *,h4,h4 *,h5,h5 *,h6,h6 *){font-weight:${weight}!important}`;
+      ${text}:not(strong,strong *,b,b *,h1,h1 *,h2,h2 *,h3,h3 *,h4,h4 *,h5,h5 *,h6,h6 *){font-weight:${weight}!important}
+      ${sidebar ? `${sidebar},${sidebar} :is(span,bdi){font-family:"${family}",sans-serif!important}` : ''}`;
   };
 }

@@ -4,7 +4,7 @@
     const { syncExportUI, EXPORT_HEADER_SELECTOR } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
     const { MESSAGE_SELECTOR } = await import(chrome.runtime.getURL('src/shared/export-content.js'));
     const selectors = await import(chrome.runtime.getURL('src/chatgpt/selectors.js'));
-    const { SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS } = selectors;
+    const { SELECTORS, SIDEBAR_SELECTORS, SIDEBAR_TITLE_SELECTOR, PANEL_RIGHT, disableDirectionCSS } = selectors;
     const core = await import(chrome.runtime.getURL('src/shared/core.js'));
     const { detectComposerDirection, detectTextDirection } = await import(chrome.runtime.getURL('src/shared/constants.js'));
     core.initExtension({ SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS });
@@ -420,6 +420,13 @@
       const style = document.createElement('style');
       style.id = 'chatgpt-rtl-engine-style';
       style.textContent = `
+        /* Align title text only; preserve the sidebar, row controls and native marquee. */
+        ${SIDEBAR_TITLE_SELECTOR}{flex:1;min-width:0;text-align:right}
+        ${SIDEBAR_TITLE_SELECTOR} > span{display:flex;justify-content:safe flex-end}
+        ${SIDEBAR_TITLE_SELECTOR} > span > span{flex-shrink:0}
+        ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content]{unicode-bidi:plaintext}
+        /* Native bdi wrappers hide an English prefix from dir=auto's first-strong detection. */
+        ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content] :is([dir="auto"],bdi){unicode-bidi:normal;direction:inherit}
         /* ChatGPT RTL Engine Styles */
         .claude-arabic-rtl {
           direction: rtl !important;

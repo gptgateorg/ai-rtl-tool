@@ -96,3 +96,13 @@ animation, dimmer, polling or permanent guide listeners.
 The output preview keeps PDF as the primary action and Word as a neutral
 secondary action. Buttons wrap at narrow widths. Word preparation/error feedback
 stays in the preview; font-installation limits are stated after download.
+
+## ChatGPT sidebar titles
+
+Keep the native sidebar position, dimensions, row controls and icons. Align only
+conversation/project title viewports right, using safe end alignment so long
+titles keep their native marquee origin. Resolve bidi from the whole title's
+first strong character rather than isolated native Latin wrappers. Do not force
+every title into RTL or rewrite its text. The selected font family applies to
+titles; native weight remains independent of the conversation weight. This is
+scoped CSS with no new observers, timers or per-title DOM writes.

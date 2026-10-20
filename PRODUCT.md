@@ -28,6 +28,9 @@ controls without knowing RTL/LTR terminology.
 - Approved feature work extends the initial popup-only port to narrowly scoped
   message/composer fonts, ChatGPT export controls, local preview handling, and
   supplied Persian brand assets. It does not authorize a supported-site redesign.
+- ChatGPT sidebar conversation/project titles are right-aligned and use the
+  selected font family at native interface weight. Preserve first-strong text
+  direction, long-title marquee, sidebar placement and row controls.
 - No new permissions, host access, or polling. The DOCX converter is the one
   scoped runtime dependency: loaded only after choosing Word in the preview,
   never in supported-site content scripts or the popup.

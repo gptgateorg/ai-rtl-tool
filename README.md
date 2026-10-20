@@ -68,6 +68,13 @@ text, while native buttons, code, math, and icons retain their own rendering.
 The popup interface continues to use its Windows fonts. See
 [font files and provenance](fonts/README.md).
 
+ChatGPT sidebar conversation/project titles also use the selected family while
+keeping the native interface weight. Titles align right without moving the
+sidebar or its controls. Mixed-language titles retain their natural first-letter
+reading direction; an English prefix is not forced to the end by RTL layout.
+Native scrolling of long titles is preserved. Turning off font correction
+restores the native title font.
+
 ## Save ChatGPT content as PDF or Word
 
 1. Open the PDF menu in the ChatGPT conversation header. Choose the whole

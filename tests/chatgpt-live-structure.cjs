@@ -1,6 +1,15 @@
 const assert=require('node:assert/strict');const fs=require('node:fs');const os=require('node:os');const path=require('node:path');
 const {chromium,root,output}=require('./harness.cjs');
-const fixture=`<main><aside><div data-markdown-text-style="assistant-message">Activity summary, not an answer</div></aside><div data-chatgpt-search-message-ids="user-1"><div data-user-message-bubble="true"><div>سلام، یک تست ساده</div></div></div><div data-chatgpt-selection-message-id="assistant-1"><div data-markdown-text-style="assistant-message" id="old"><div data-dil-message-id="assistant-1"><p>پاسخ قبلی</p></div></div></div><div data-chatgpt-selection-message-id="assistant-2"><div data-markdown-text-style="assistant-message" id="stream"><div data-dil-message-id="assistant-2"><p id="live">Hello</p><ul><li id="item">English</li></ul><pre><code id="code">const n = 1;</code></pre></div></div></div><div class="ProseMirror" contenteditable="true" role="textbox"></div><button id="native">Native</button></main>`;
+const title=(id,text,project=false)=>`<div class="sidebar-row" ${project?'data-app-action-sidebar-project-row':''}><svg class="row-icon"></svg><span ${project?'':'data-thread-title'} data-marquee-text id="${id}"><span class="clip"><span class="track"><span data-marquee-content><span dir="auto">${text}</span></span></span></span></span><button aria-label="Options">⋯</button></div>`;
+const sidebar=`<style>body{margin:0;font-family:Arial}#app-shell-sidebar{width:280px;background:#161616;color:#eee;padding:8px;box-sizing:border-box;direction:ltr}.sidebar-row{display:flex;align-items:center;gap:8px;height:44px}.row-icon{width:20px;height:20px;flex:none}.sidebar-row button{flex:none;width:24px} [data-marquee-text]{min-width:0;flex:1;white-space:nowrap}.clip{display:block;overflow:hidden}.track{display:inline-flex;min-width:max-content}[data-marquee-content]{min-width:max-content}.sidebar-row:hover .track{transform:translateX(var(--test-scroll,0px))}</style>
+<nav id="app-shell-sidebar">
+${title('english-first','<bdi id="en-prefix">GPTGate</bdi><span id="fa-tail"> بازطراحی جدول</span>')}
+${title('persian-first','<span id="fa-prefix">آزمایش نمایش فارسی </span><bdi id="en-tail">PDF</bdi>')}
+${title('english-only','gate design')}
+${title('project-title','درس فارسی',true)}
+${title('long-title','<bdi>GPTGate</bdi> '+ 'گفتگوی طولانی '.repeat(15))}
+</nav>`;
+const fixture=sidebar+`<main><aside><div data-markdown-text-style="assistant-message">Activity summary, not an answer</div></aside><div data-chatgpt-search-message-ids="user-1"><div data-user-message-bubble="true"><div>سلام، یک تست ساده</div></div></div><div data-chatgpt-selection-message-id="assistant-1"><div data-markdown-text-style="assistant-message" id="old"><div data-dil-message-id="assistant-1"><p>پاسخ قبلی</p></div></div></div><div data-chatgpt-selection-message-id="assistant-2"><div data-markdown-text-style="assistant-message" id="stream"><div data-dil-message-id="assistant-2"><p id="live">Hello</p><ul><li id="item">English</li></ul><pre><code id="code">const n = 1;</code></pre></div></div></div><div class="ProseMirror" contenteditable="true" role="textbox"></div><button id="native">Native</button></main>`;
 (async()=>{
  const dist=path.join(root,'dist');const profile=fs.mkdtempSync(path.join(os.tmpdir(),'gptgate-live-structure-'));
  const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,args:[`--disable-extensions-except=${dist}`,`--load-extension=${dist}`]});const errors=[];
@@ -23,6 +32,42 @@ const fixture=`<main><aside><div data-markdown-text-style="assistant-message">Ac
   await page.waitForFunction(()=>document.body.classList.contains('gptgate-use-font'));
   assert.ok(await page.locator('#live').evaluate(e=>getComputedStyle(e).fontFamily.includes('GPTGate IranSans')));
   assert.ok(!(await page.locator('#native').evaluate(e=>getComputedStyle(e).fontFamily)).includes('GPTGate'));
+  await page.evaluate(()=>document.fonts.ready);
+  const sidebarGeometry=()=>page.evaluate(()=>{
+   const rect=s=>document.querySelector(s).getBoundingClientRect();
+   return {x:rect('#app-shell-sidebar').x,width:rect('#app-shell-sidebar').width,
+    iconX:rect('.row-icon').x,menuX:rect('.sidebar-row button').x,
+    englishPrefixFirst:rect('#en-prefix').right<=rect('#fa-tail').left+1,
+    persianPrefixFirst:rect('#fa-prefix').left>=rect('#en-tail').right-1,
+    shortRight:Math.abs(rect('#english-first .track').right-rect('#english-first .clip').right)<1,
+    longStartVisible:Math.abs(rect('#long-title .track').left-rect('#long-title .clip').left)<1,
+    projectRight:Math.abs(rect('#project-title .track').right-rect('#project-title .clip').right)<1,
+    titleWeight:getComputedStyle(document.querySelector('#english-first')).fontWeight,
+    nativeFont:getComputedStyle(document.querySelector('.sidebar-row button')).fontFamily};
+  });
+  const geometry=await sidebarGeometry();
+  assert.equal(geometry.x,0);assert.equal(geometry.width,280);assert.equal(geometry.iconX,8);
+  for(const key of ['englishPrefixFirst','persianPrefixFirst','shortRight','longStartVisible','projectRight'])assert.ok(geometry[key],key);
+  assert.equal(geometry.titleWeight,'400');assert.ok(!geometry.nativeFont.includes('GPTGate'));
+  await worker.evaluate(()=>chrome.storage.sync.set({fontFamily:'vazirmatn',fontWeight:900}));
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#english-first')).fontFamily.includes('Vazirmatn'));
+  assert.equal(await page.locator('#english-first').evaluate(e=>getComputedStyle(e).fontWeight),'400','Conversation weight must not make sidebar heavy');
+  await page.evaluate(()=>document.fonts.ready);
+  await page.locator('#app-shell-sidebar').screenshot({path:path.join(output,'sidebar-titles-desktop.png')});
+  await page.setViewportSize({width:320,height:700});
+  assert.deepEqual(await sidebarGeometry(),geometry,'Sidebar and buttons must retain their placement across narrow viewport/font changes');
+  await page.locator('#app-shell-sidebar').screenshot({path:path.join(output,'sidebar-titles-320.png')});
+  // Native marquee transforms still work; oversized titles start at their normal leading edge.
+  await page.locator('#long-title').evaluate(e=>e.closest('.sidebar-row').style.setProperty('--test-scroll','-40px'));
+  await page.locator('#long-title').hover();
+  assert.equal(await page.locator('#long-title .track').evaluate(e=>getComputedStyle(e).transform),'matrix(1, 0, 0, 1, -40, 0)');
+  await worker.evaluate(()=>chrome.storage.sync.set({fontFix:false}));
+  await page.waitForFunction(()=>!getComputedStyle(document.querySelector('#english-first')).fontFamily.includes('GPTGate'));
+  await worker.evaluate(()=>chrome.storage.sync.set({fontFix:true,fontFamily:'iransans',fontWeight:500}));
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#english-first')).fontFamily.includes('IranSans'));
+  await page.evaluate(()=>{const e=document.querySelector('#english-first');e.outerHTML=e.outerHTML.replace('GPTGate','AI');});
+  assert.ok((await sidebarGeometry()).englishPrefixFirst,'Dynamically replaced title must keep its English prefix without a rescan');
+  await page.setViewportSize({width:1280,height:720});
   let world;
   for(const context of worlds){const result=await cdp.send('Runtime.evaluate',{contextId:context.id,expression:'Boolean(window.__gptgate_chatgpt_engine)',returnByValue:true});if(result.result.value)world=context;}
   assert.ok(world,'Content-script isolated world not found');
