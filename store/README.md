@@ -44,18 +44,19 @@ worker alone is not proof that its module listeners are ready.
 
 Artwork checks verify loaded fonts/images and layout bounds. Rendered screenshots
 were visually inspected; image dimensions, color mode and ZIP contents are
-validated during packaging. Claude was tested in the owner's real Chrome;
-Gemini returned a server 403 and still requires live validation. Screenshots and
-synthetic test fixtures do not establish live Gemini compatibility.
+validated during packaging. Both Claude and Gemini were tested in the owner's
+real Chrome, including font changes, custom-font persistence, multilingual
+input, streaming, navigation and on/off CPU comparisons. Gemini's initial 403
+was resolved by the owner before its live tests. See the validation report for
+measurement limits; these checks do not guarantee zero overhead on every page.
 
 ## Required to finish
 
-1. Complete real Gemini functional and CPU checks after its 403 is resolved.
-2. Publish the reviewed extension policy at an approved public URL.
-3. Reopen the existing item's dashboard in the owner's developer profile.
-4. Upload 0.1.2 as an update; use the matching language tabs for metadata and
+1. Publish the reviewed extension policy at an approved public URL.
+2. Reopen the existing item's dashboard in the owner's developer profile.
+3. Upload 0.1.2 as an update; use the matching language tabs for metadata and
    descriptions, and upload the new artwork. Complete accurate privacy fields.
-5. Show the completed draft, distribution and attestations to the owner before
+4. Show the completed draft, distribution and attestations to the owner before
    final submission. Do not claim that submission means review approval.
 
 Site landing pages, educational videos, channel distribution and optional

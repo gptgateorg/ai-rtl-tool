@@ -7,11 +7,11 @@ macOS. The unpacked extension was reloaded through Chrome's extension manager.
 No upload, store submission, publication, account configuration or other
 extension change was performed.
 
-Claude was tested on the real authenticated site with a new public synthetic
-conversation. Gemini's real `https://gemini.google.com/app` tab returned Google's
-403 page. Its live composer, responses, streaming and CPU remain unverified;
-fixture success is not live Gemini approval. The owner was asked to restore
-normal Gemini access. Release readiness remains conditional on that check.
+Both Claude and Gemini were tested on the real authenticated sites with new
+public synthetic conversations. Gemini initially returned Google's 403 page;
+after the owner restored normal access, its live tests were completed in the
+same Chrome profile. No network, proxy or account settings were changed by the
+agent. Store publication requirements remain separate from these checks.
 
 ## Changes
 
@@ -61,14 +61,44 @@ world. Subsequent checks used the actual popup controls. This is recorded in
 `artifacts/qa/real-chrome-error-ledger.json`; the entry was preserved rather than
 cleared, and is not an error in a packaged source file.
 
+## Real Gemini checks
+
+Passed on the same installed unpacked extension after access was restored:
+
+- IRANSans, Vazirmatn, Shabnam and Sahel at 400/700 in existing responses and
+  the composer. Actual FontFace entries reached `loaded` for every family.
+- Forced response and composer RTL/LTR, automatic Persian/English/mixed input,
+  and a two-paragraph English/Persian draft with independently correct visual
+  alignment. Code and mathematical expressions retained LTR.
+- Font/math toggles, a temporary open-source WOFF2 upload, its successful load
+  after a real page refresh, and removal with IRANSans 500 restored.
+- A second real streamed response including Persian/English paragraphs, a
+  table, JavaScript and math; the composer was usable again after sending.
+- Navigation to a new chat and back, extension panel bounds, and preservation
+  of native button/icon fonts.
+
+The initial refresh check used a fixed delay that expired before Gemini had
+finished loading. The completed check instead waited for the actual response,
+composer and uploaded FontFace to be ready; no product fix was needed. Only
+known QA drafts were cleared, the temporary font was removed, and the original
+preferences were restored. The public test conversation remains in history.
+Final restoration confirmed both site engines active and the original popup
+preferences intact; Gemini was on its new-chat homepage. Temporary QA utility
+tabs were closed. See `artifacts/qa/gemini-final-chrome-state.json`.
+
+Evidence: `artifacts/qa/gemini-live-functional.json`,
+`gemini-stream-live.json`, `gemini-navigation-live.json` and
+`real-cpu-gemini-*.json` in that directory. These are real Chrome tests, not
+fixture results. This follow-up did not change runtime source or the built ZIP.
+
 ## CPU measurement
 
 Each row uses three ten-second samples of OS cumulative CPU time for the actual
-Claude renderer. Chrome Process Internals resolves its renderer client ID,
+site renderer. Chrome Process Internals resolves its renderer client ID,
 which is matched to the OS PID. The tab stays visible and focused, generation
 has finished, and the composer is blurred. A value of 100% means one CPU core.
 Other installed extensions remain enabled and are included, together with
-Claude itself. Headless test suites were not run during these samples.
+the site itself. Headless test suites were not run during these samples.
 
 | Conversation | Extension state | Median of three samples |
 | --- | --- | ---: |
@@ -84,8 +114,39 @@ The final same-conversation on/off comparison is effectively equal (40.06% vs
 The initial implementation's measured median was higher, but the native page
 and other extensions are noisy; these measurements do not establish a precise
 causal saving or a zero-overhead guarantee. The roughly 40% renderer baseline
-also exists with GptGate off. Real Gemini and prolonged real streaming CPU are
-not characterized by this idle comparison.
+also exists with GptGate off. Prolonged real streaming CPU is not characterized
+by this idle comparison.
+
+### Gemini controlled comparison
+
+Both states use the same two-reply conversation. Before each reload the old
+`performance.timeOrigin` is recorded; the test waits for a different document,
+complete page/fonts, responses and composer, then settles for 30 seconds. Every
+sample verifies visibility, two responses, no generation and unchanged document
+identity. This avoids counting an old page or navigation work as idle time.
+
+| Extension state | Median, one core | Sample range |
+| --- | ---: | ---: |
+| On | 32.97% | 31.67–36.34% |
+| Off | 32.16% | 30.57–33.57% |
+
+The measured median difference is **+0.80 percentage points of one core**.
+This is a small positive difference, not a zero-overhead result. The sample
+ranges overlap; short sequential samples cannot isolate that difference from
+native site and other-extension variability. No new functional failure or
+repeated idle document scan was found, but strict zero added CPU is not proven.
+
+Earlier exploratory CPU files are retained but not used for this comparison:
+the initial readiness check could accept the old document before a reload
+committed. A temporary no-blur panel probe did not establish an improvement;
+it was removed and no rendering or runtime source change was retained. A
+separate ten-second real idle DOM observation recorded no child-list/text
+changes. The documented controlled result takes precedence over preliminary
+numbers in progress updates.
+
+Evidence: `artifacts/qa/gemini-controlled-cpu-summary.json`,
+`gemini-controlled-on-readiness.json`, `gemini-controlled-off-readiness.json`,
+`real-cpu-gemini-controlled-on.json` and `real-cpu-gemini-controlled-off.json`.
 
 ## Automated checks and review
 
@@ -110,8 +171,5 @@ was also reviewed. No dependency or host/permission expansion was introduced.
 
 ## Outstanding before publication
 
-1. Restore normal Gemini access in the owner's Chrome profile, then run real
-   font/weight/upload, direction, multiline input, code/math, streaming,
-   navigation and on/off CPU checks. The 403 page is not a supported-site test.
-2. Complete the existing public privacy-policy URL and store draft approval
-   requirements in `store/README.md`.
+Complete the existing public privacy-policy URL and store draft approval
+requirements in `store/README.md`. The live Gemini access blocker is resolved.
