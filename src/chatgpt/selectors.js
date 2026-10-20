@@ -1,5 +1,11 @@
+export const SIDEBAR_TITLE_SELECTOR = ':is(#app-shell-sidebar,[data-sidebar-navigation-root]) :is([data-thread-title],[data-app-action-sidebar-project-row] [data-marquee-text])';
+export const HOME_SUGGESTION_TEXT_SELECTOR = '[class~="group/home-suggestions"] [class~="group/home-suggestion-list-item"] [data-composer-mode] > span.truncate';
+
 export const SELECTORS = {
+  interfaceText: [SIDEBAR_TITLE_SELECTOR, HOME_SUGGESTION_TEXT_SELECTOR],
   responses: [
+    '[data-markdown-text-style="assistant-message"]',
+    '[data-user-message-bubble]',
     '[data-message-author-role="assistant"]',
     '[data-message-author-role="user"]',
     '[data-testid="conversation-turn"]',

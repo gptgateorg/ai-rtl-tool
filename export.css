@@ -1,0 +1,50 @@
+/*! IRANSansX is proprietary software. License: 8OHVZX36.
+    Terms: https://fontiran.com/ — see fonts/FontLicense.txt. */
+@font-face{font-family:GPTGateUI;src:url("fonts/IRANSansX-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:GPTGateUI;src:url("fonts/IRANSansX-Bold.woff2") format("woff2");font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+body{margin:0;background:#DFF7EE;color:#0D3B32;font:14px/1.9 GPTGateUI,sans-serif}
+.toolbar{display:flex;align-items:center;gap:24px;max-width:1040px;margin:auto;padding:24px}
+.toolbar img{object-fit:contain;flex-shrink:0}
+h1{font-size:20px;margin:0}p{margin:.6em 0}
+.toolbar p{font-size:12px;margin:0;color:#3D6159}
+button{font:inherit;background:#0D3B32;color:#fff;border:0;border-radius:12px;padding:10px 20px;min-height:44px;cursor:pointer;margin-inline-start:auto;transition:transform 150ms cubic-bezier(.32,.72,0,1)}
+button:active{transform:scale(.98)}button:focus-visible{outline:2px solid #2A7360;outline-offset:4px}button:disabled{opacity:.5;cursor:wait}
+aside{max-width:900px;margin:0 auto 16px;padding:12px 20px;font-size:12px}
+#document{max-width:900px;margin:0 auto 40px;padding:48px;background:white;color:#172620;border-radius:18px;overflow-wrap:anywhere}
+.document-heading{border-bottom:1px solid #B5E8D6;padding-bottom:16px;margin-bottom:32px}
+h2{font-size:24px;line-height:1.6;margin:0}
+#meta{font-size:11px;color:#3D6159;direction:rtl}
+.message{padding-block:16px 24px;border-bottom:1px solid #ddd}
+.message:last-child{border:0}
+.role{font:700 11px/1.8 GPTGateUI,sans-serif;color:#3D6159;margin-bottom:12px;break-after:avoid}
+.message-content{font-family:var(--chat-font,GPTGateUI),sans-serif;font-size:15px;font-weight:var(--chat-weight,400);line-height:1.9}
+.message-content :is(h1,h2,h3,h4,h5,h6){break-after:avoid}
+pre,code,kbd,samp{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:400;direction:ltr;text-align:left;unicode-bidi:isolate}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;border:1px solid #ddd;border-radius:8px;font-size:12px;line-height:1.6}
+pre code{white-space:inherit}
+table{border-collapse:collapse;width:100%;table-layout:auto;font-size:13px}
+td,th{border:1px solid #ddd;padding:8px;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}
+blockquote{margin-inline:0;padding-inline:16px;border-inline-start:3px solid #5FBFA0}
+math,.math-fallback{direction:ltr;unicode-bidi:isolate;font-family:math,serif;font-weight:400}
+math[display=block]{margin-block:16px;overflow-wrap:normal}
+.message-content img{max-width:100%;height:auto;break-inside:avoid}
+a{color:#2A7360;text-decoration:underline}
+.image-note{color:#52645d;font-size:12px}
+@media(max-width:650px){.toolbar{flex-wrap:wrap;gap:16px;padding:16px}.toolbar button{margin:0}.toolbar img{width:120px;height:40px}#document{padding:24px;margin:0 12px 24px}aside{padding:12px 20px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+@page{size:A4;margin:16mm}
+@media print{
+  body{background:white;color:black}
+  .toolbar,aside{display:none!important}
+  #document{max-width:none;margin:0;padding:0;border:0;border-radius:0}
+  .message{break-inside:auto}
+  p,li{orphans:3;widows:3}
+  details{display:block}details>*{display:block}
+}
+
+.export-actions{display:flex;flex-wrap:wrap;gap:8px;margin-inline-start:auto}.export-actions button{margin:0;font-size:13px}
+button.secondary{background:#F4F7F6;color:#0D3B32;border:1px solid #B9C9C2}
+.word-status{max-width:900px;margin:0 auto 16px;padding:0 20px;font-size:12px}
+@media(max-width:650px){.export-actions{margin-inline-start:0}}
+@media print{.word-status{display:none!important}}

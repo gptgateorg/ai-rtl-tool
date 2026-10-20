@@ -14,6 +14,8 @@ vite.config.js.timestamp-*.mjs
 
 # Tests and reports
 coverage/
+artifacts/
+.impeccable/review/
 
 # Environment and logs
 .env

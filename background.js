@@ -14,6 +14,31 @@ const URLS = [
   'https://claude.ai/*'
 ];
 const ALLOWED_DOMAINS = ['t.me', 'telegram.me'];
+let exportQueue = Promise.resolve();
+let tipQueue = Promise.resolve();
+const TIPS_KEY = 'gptgate:first-use-tips';
+
+async function openExport(payload, sender) {
+  const source = new URL(sender.url || sender.tab?.url || '');
+  if (source.protocol !== 'https:' || !['chatgpt.com','chat.openai.com'].includes(source.hostname)) throw Error('Unsupported source');
+  if (!payload || !['response','conversation'].includes(payload.scope)
+      || !Array.isArray(payload.messages) || !payload.messages.length || payload.messages.length>500
+      || payload.messages.some(m=>!['user','assistant'].includes(m.role)||typeof m.html!=='string')
+      || JSON.stringify(payload).length>2*1024*1024) throw Error('حجم گفتگو برای خروجی یک‌جا زیاد است؛ از پاسخ‌ها جداگانه خروجی بگیرید.');
+  const old = await chrome.storage.session.get(null);
+  const entries = Object.entries(old).filter(([k])=>k.startsWith('pdf:')).sort((a,b)=>b[1].createdAt-a[1].createdAt);
+  // Keep at most two recent previews; session data disappears when Chrome closes.
+  const expired = entries.filter(([,v],i)=>i>=1 || Date.now()-v.createdAt>30*60*1000).map(([k])=>k);
+  if (expired.length) await chrome.storage.session.remove(expired);
+  const id = crypto.randomUUID();
+  const key = `pdf:${id}`;
+  await chrome.storage.session.set({[key]:{
+    messages:payload.messages, scope:payload.scope, title:String(payload.title || 'گفتگو').slice(0,200),
+    boundaryReached:payload.boundaryReached===true, unstableIdentity:payload.unstableIdentity===true, createdAt:Date.now(),
+  }});
+  try { await chrome.tabs.create({url:chrome.runtime.getURL(`export.html#${id}`)}); }
+  catch (error) { await chrome.storage.session.remove(key); throw error; }
+}
 
 /* ── Helpers ── */
 
@@ -40,33 +65,41 @@ function isSupportedHost(url) {
 
 /* ── Re-inject content script on install/update ── */
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.tabs.query({ url: URLS }, (tabs) => {
-    tabs.forEach((tab) => {
-      if (!tab.id || !tab.url) return;
-      
-      let script = '';
-      if (tab.url.includes('chatgpt.com') || tab.url.includes('chat.openai.com')) {
-        script = 'src/chatgpt/content.js';
-      } else if (tab.url.includes('gemini.google.com')) {
-        script = 'src/gemini/content.js';
-      } else if (tab.url.includes('claude.ai')) {
-        script = 'src/claude/content.js';
-      }
-      
-      if (script) {
-        chrome.scripting.executeScript(
-          { target: { tabId: tab.id }, files: [script] },
-          () => void chrome.runtime.lastError
-        );
-      }
-    });
-  });
+chrome.runtime.onInstalled.addListener(({reason}) => {
+  if (reason === 'install') tipQueue = tipQueue.catch(()=>{}).then(()=>chrome.storage.local.set({[TIPS_KEY]:{popup:true,pdf:true}}));
+  void tipQueue.catch(()=>{}).then(async()=>{
+    const tabs = await chrome.tabs.query({url:URLS});
+    const entries = chrome.runtime.getManifest().content_scripts;
+    for (const tab of tabs) {
+      if (!tab.id || !tab.url) continue;
+      // Production content scripts are hashed; inject the shipped files.
+      const origin = new URL(tab.url).origin;
+      const files = entries.find(entry=>entry.matches.includes(`${origin}/*`))?.js;
+      if (files?.length) void chrome.scripting.executeScript({target:{tabId:tab.id},files}).catch(()=>{});
+    }
+  }).catch(()=>{});
 });
 
 /* ── Open links — with URL domain validation (S1/S2) ── */
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === 'gptgate:claim-tip' && ['popup','pdf'].includes(msg.surface)) {
+    // Serialize claims so several open ChatGPT tabs cannot show the first-use hint twice.
+    tipQueue = tipQueue.catch(()=>{}).then(async()=>{
+      const state = (await chrome.storage.local.get(TIPS_KEY))[TIPS_KEY] || {};
+      if (!state[msg.surface]) return {show:false};
+      await chrome.storage.local.set({[TIPS_KEY]:{...state,[msg.surface]:false}});
+      return {show:true};
+    });
+    tipQueue.then(sendResponse,()=>sendResponse({show:false}));
+    return true;
+  }
+
+  if (msg?.type === 'gptgate:export-pdf') {
+    exportQueue = exportQueue.catch(()=>{}).then(()=>openExport(msg.payload,sender));
+    exportQueue.then(()=>sendResponse({ok:true}),error=>sendResponse({ok:false,error:error.message}));
+    return true;
+  }
   if (msg?.type === 'open-link' && typeof msg.url === 'string') {
     if (isAllowedDomain(msg.url)) {
       chrome.tabs.create({ url: msg.url });

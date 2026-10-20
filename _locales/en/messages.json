@@ -1,0 +1,8 @@
+{
+  "extensionName": {
+    "message": "GptGate | Persian fonts and RTL for AI chats"
+  },
+  "extensionDescription": {
+    "message": "Persian fonts and text direction for ChatGPT, Gemini and Claude. Export ChatGPT conversations to PDF or editable Word locally."
+  }
+}

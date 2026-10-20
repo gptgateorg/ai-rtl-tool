@@ -1,3 +1,4 @@
+import { createFontController, CUSTOM_FONT_KEY } from './fonts.js';
 import {
   DEFAULT_STATE,
   normalizeState,
@@ -6,7 +7,7 @@ import {
 } from './constants.js';
 
 const STYLE_ID = 'gptgate-style-core';
-const FONT_ID = 'gptgate-font-link';
+const FONT_STYLE_ID = 'gptgate-font-style';
 const PANEL_ID = 'gptgate-floating-panel';
 const PANEL_STYLE_ID = 'gptgate-floating-panel-style';
 export function initExtension(platformSelectors) {
@@ -26,7 +27,7 @@ export function initExtension(platformSelectors) {
   const isChatGPT = window.location.hostname.includes('chatgpt.com') || window.location.hostname.includes('chat.openai.com');
   const isGemini = window.location.hostname.includes('gemini.google.com');
   const isClaude = window.location.hostname.includes('claude.ai');
-  let claudeDarkSurface = true;
+  let claudeDarkSurface = DEFAULT_STATE.claudeDarkSurface;
   const isContextInvalidated = () => {
     try {
       if (typeof chrome === 'undefined' || !chrome || !chrome.runtime || !chrome.runtime.id) {
@@ -48,6 +49,7 @@ export function initExtension(platformSelectors) {
     }
     if (handleResize) {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('transitionend', schedulePanelPlacementDebounced);
     }
     if (handleVisibilityChange) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -59,7 +61,9 @@ export function initExtension(platformSelectors) {
     if (typeof chrome !== 'undefined' && chrome?.runtime?.connect) {
       const port = chrome.runtime.connect({ name: 'gptgate-context' });
       port.onDisconnect.addListener(() => {
-        handleInvalidation();
+        // A missing/suspended worker can disconnect a still-valid content script.
+        void chrome.runtime.lastError;
+        if (isContextInvalidated()) handleInvalidation();
       });
     }
   } catch (err) {
@@ -379,86 +383,6 @@ export function initExtension(platformSelectors) {
           transform: none !important;
         }
 
-        /* ChatGPT: move into the header actions only when the bottom panel would cover the composer */
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top {
-          position: relative !important;
-          top: auto !important;
-          right: auto !important;
-          bottom: auto !important;
-          left: auto !important;
-          width: 112px !important;
-          height: 36px !important;
-          min-width: 112px !important;
-          padding: 0 9px !important;
-          gap: 7px !important;
-          border-radius: 11px !important;
-          justify-content: flex-start !important;
-          align-self: center !important;
-          margin: 0 0 0 4px !important;
-          transform: none !important;
-          flex: 0 0 112px !important;
-          z-index: 1 !important;
-          overflow: hidden !important;
-          contain: layout style !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top .gptgate-logo {
-          width: 24px !important;
-          height: 24px !important;
-          border-radius: 6px !important;
-          flex: 0 0 24px !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top .gptgate-title {
-          display: inline-flex !important;
-          position: static !important;
-          height: auto !important;
-          padding: 0 !important;
-          background: transparent !important;
-          border: 0 !important;
-          box-shadow: none !important;
-          margin: 0 !important;
-          font-size: 11px !important;
-          line-height: 1 !important;
-          opacity: 1 !important;
-          transform: none !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top:hover {
-          width: 112px !important;
-          min-width: 112px !important;
-          height: 36px !important;
-          padding: 0 9px !important;
-          border-radius: 11px !important;
-          justify-content: flex-start !important;
-          transform: translate3d(0, -2px, 0) !important;
-          border-color: rgba(47, 204, 225, 0.3) !important;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(47, 204, 225, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top:hover .gptgate-logo {
-          width: 24px !important;
-          height: 24px !important;
-          border-radius: 6px !important;
-          transform: scale(1.04) !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top:hover .gptgate-title {
-          opacity: 1 !important;
-          transform: none !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top.is-collapsed {
-          width: 112px !important;
-          min-width: 112px !important;
-          height: 36px !important;
-          padding: 0 9px !important;
-          transform: none !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top.is-collapsed:hover {
-          width: 112px !important;
-          min-width: 112px !important;
-          height: 36px !important;
-          padding: 0 9px !important;
-          transform: translate3d(0, -2px, 0) !important;
-        }
-        body.gptgate-platform-chatgpt #${PANEL_ID}.gptgate-top.is-collapsed:hover .gptgate-title {
-          opacity: 1 !important;
-        }
       `;
       document.documentElement.appendChild(style);
     }
@@ -481,6 +405,7 @@ export function initExtension(platformSelectors) {
   }
 
   function ensureFloatingPanel() {
+    if (isChatGPT) return; // Attribution lives in the single PDF menu.
     if (isContextInvalidated()) {
       handleInvalidation();
       return;
@@ -504,7 +429,7 @@ export function initExtension(platformSelectors) {
       const logo = document.createElement('img');
       logo.className = 'gptgate-logo';
       try {
-        logo.src = chrome.runtime.getURL('images/logo.png');
+        logo.src = chrome.runtime.getURL('images/brand-mark.svg');
       } catch (_) {
         // Extension context invalidated or getURL failed
         logo.src = '';
@@ -559,7 +484,7 @@ export function initExtension(platformSelectors) {
           document.body.appendChild(panel);
         }
       }
-    } else if (isClaude || isChatGPT) {
+    } else if (isClaude) {
       if (!panel.parentElement || !document.body.contains(panel)) {
         document.body.appendChild(panel);
       }
@@ -569,7 +494,7 @@ export function initExtension(platformSelectors) {
       }
     }
     updateFloatingPanelLayout();
-    if (isClaude || isChatGPT) updatePanelPlacement();
+    if (isClaude) updatePanelPlacement();
   }
 
   let sidebarElement = null;
@@ -612,6 +537,7 @@ export function initExtension(platformSelectors) {
   }
 
   function updateFloatingPanelLayout({ autoFind = true } = {}) {
+    if (isChatGPT) return;
     if (isContextInvalidated()) {
       handleInvalidation();
       return;
@@ -712,107 +638,13 @@ export function initExtension(platformSelectors) {
     }
   }
 
-  function getVisibleRect(el) {
-    if (!el || !document.body.contains(el)) return null;
-    const style = window.getComputedStyle(el);
-    if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || '1') < 0.05) return null;
-    const rect = el.getBoundingClientRect();
-    if (rect.width < 1 || rect.height < 1) return null;
-    return rect;
-  }
-
-  function findChatGPTComposerRect() {
-    const selectors = [
-      'form[data-type="unified-composer"] [data-composer-surface="true"]',
-      'form[data-type="unified-composer"]',
-      '#thread-bottom [data-composer-surface="true"]',
-      '#thread-bottom form',
-      '#prompt-textarea',
-    ];
-
-    for (const selector of selectors) {
-      const rect = getVisibleRect(document.querySelector(selector));
-      if (rect) return rect;
-    }
-    return null;
-  }
-
-  function findChatGPTHeaderActions() {
-    const selectors = [
-      '[data-testid="thread-header-right-actions-container"]',
-      '[data-testid="thread-header-right-actions"]',
-      '#conversation-header-actions',
-    ];
-
-    for (const selector of selectors) {
-      const el = document.querySelector(selector);
-      const rect = getVisibleRect(el);
-      if (rect && rect.width >= 24 && rect.height >= 24) return el;
-    }
-
-    const header = document.querySelector('#page-header, header');
-    return getVisibleRect(header) ? header : null;
-  }
-
-  function getRestingBottomPanelRect(panel) {
-    const vw = window.innerWidth || document.documentElement.clientWidth || 0;
-    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
-    const collapsed = panel?.classList.contains('is-collapsed');
-    const width = collapsed ? 38 : 46;
-    const height = collapsed ? 38 : 46;
-    const right = vw - PANEL_RIGHT;
-    const bottom = vh - 30;
-
-    return {
-      left: right - width,
-      right,
-      top: bottom - height,
-      bottom,
-      width,
-      height,
-    };
-  }
-
-  function rectsOverlap(a, b, margin = 0) {
-    if (!a || !b) return false;
-    return (
-      a.left < b.right + margin &&
-      a.right > b.left - margin &&
-      a.top < b.bottom + margin &&
-      a.bottom > b.top - margin
-    );
-  }
-
-  function updateChatGPTPanelPlacement() {
-    const panel = document.getElementById(PANEL_ID);
-    if (!panel) return;
-
-    const container = findChatGPTHeaderActions();
-    const composerRect = findChatGPTComposerRect();
-    const isTop = panel.classList.contains('gptgate-top');
-    const restingRect = getRestingBottomPanelRect(panel);
-    const overlapMargin = isTop ? 24 : 8;
-    const shouldBeTop = !!container && !!composerRect && rectsOverlap(restingRect, composerRect, overlapMargin);
-
-    panel.classList.toggle('gptgate-top', shouldBeTop);
-
-    if (shouldBeTop && container) {
-      if (panel.parentElement !== container) {
-        container.appendChild(panel);
-      }
-    } else if (panel.parentElement !== document.body) {
-      document.body.appendChild(panel);
-    }
-  }
-
   function updatePanelPlacement() {
     if (isClaude) updateClaudePanelPlacement();
-    if (isChatGPT) updateChatGPTPanelPlacement();
   }
 
   let panelPlacementRafId = null;
   function schedulePanelPlacement() {
-    if (!isClaude && !isChatGPT) return;
+    if (!isClaude) return;
     if (panelPlacementRafId) return;
     panelPlacementRafId = requestAnimationFrame(() => {
       panelPlacementRafId = null;
@@ -823,7 +655,7 @@ export function initExtension(platformSelectors) {
 
   let panelPlacementTimerId = null;
   function schedulePanelPlacementDebounced() {
-    if (!isClaude && !isChatGPT) return;
+    if (!isClaude) return;
     if (panelPlacementTimerId) clearTimeout(panelPlacementTimerId);
     panelPlacementTimerId = setTimeout(() => {
       panelPlacementTimerId = null;
@@ -833,7 +665,6 @@ export function initExtension(platformSelectors) {
   }
 
   let claudeBodyResizeObserver = null;
-  let chatGPTBodyResizeObserver = null;
 
   let rafId = null;
   let geminiPlacementTimerId = null;
@@ -863,86 +694,7 @@ export function initExtension(platformSelectors) {
     }, 120);
   }
 
-  /* ── Font injection constants ── */
-  const FONT_STYLE_ID = 'gptgate-font-style';
-  const FONT_FAMILY_NAME = 'IRANSansX';
-
-  function injectCustomFont() {
-    if (document.getElementById(FONT_STYLE_ID)) return;
-
-    try {
-      const fontUrl = chrome.runtime.getURL('fonts/IRANSansX-MediumD4.woff2');
-
-      const cssString = `
-        @font-face {
-          font-family: '${FONT_FAMILY_NAME}';
-          src: url('${fontUrl}') format('woff2');
-          font-weight: normal;
-          font-style: normal;
-          font-display: swap;
-        }
-
-        /* ── Apply font to ALL text ── */
-        html body.gptgate-use-font * {
-          font-family: '${FONT_FAMILY_NAME}', 'Vazirmatn', sans-serif !important;
-        }
-
-        /* ── Protect icon fonts explicitly ── */
-        html body.gptgate-use-font mat-icon,
-        html body.gptgate-use-font mat-icon[data-mat-icon-type="font"],
-        html body.gptgate-use-font mat-icon.mat-ligature-font,
-        html body.gptgate-use-font .lumi-symbols,
-        html body.gptgate-use-font .material-icons,
-        html body.gptgate-use-font .material-icons-outlined,
-        html body.gptgate-use-font .material-icons-extended,
-        html body.gptgate-use-font .material-icons-round,
-        html body.gptgate-use-font .material-icons-sharp,
-        html body.gptgate-use-font .material-icons-two-tone,
-        html body.gptgate-use-font .material-symbols-outlined,
-        html body.gptgate-use-font .material-symbols-rounded,
-        html body.gptgate-use-font .material-symbols-sharp,
-        html body.gptgate-use-font [class*="material-symbols"],
-        html body.gptgate-use-font .google-symbols,
-        html body.gptgate-use-font [class*="google-symbols"] {
-          font-family: 'Luminous Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons', 'Google Symbols', sans-serif !important;
-        }
-
-        /* ── Protect Claude icons explicitly ── */
-        html body.gptgate-use-font [data-cds="Icon"] {
-          font-family: var(--font-anthropicons, 'Anthropicons-Variable') !important;
-        }
-
-        /* ── Keep code blocks monospace ── */
-        html body.gptgate-use-font pre,
-        html body.gptgate-use-font pre *,
-        html body.gptgate-use-font code,
-        html body.gptgate-use-font code *,
-        html body.gptgate-use-font [class*="code-"],
-        html body.gptgate-use-font [class*="code-"] *,
-        html body.gptgate-use-font .hljs,
-        html body.gptgate-use-font .hljs * {
-          font-family: 'Courier New', Consolas, monospace !important;
-        }
-
-        /* ── Keep math blocks standard ── */
-        html body.gptgate-use-font .katex,
-        html body.gptgate-use-font .katex *,
-        html body.gptgate-use-font .katex-display,
-        html body.gptgate-use-font .katex-display *,
-        html body.gptgate-use-font .mjx-container,
-        html body.gptgate-use-font .mjx-container * {
-          font-family: KaTeX_Main, 'Times New Roman', serif !important;
-        }
-      `;
-
-      const style = document.createElement('style');
-      style.id = FONT_STYLE_ID;
-      style.textContent = cssString;
-      document.documentElement.appendChild(style);
-    } catch (err) {
-      console.warn('[GptGate] Failed to inject font style:', err);
-    }
-  }
+  const updateFont = createFontController(platformSelectors.SELECTORS);
 
   /* ── State management ── */
   let currentState = { ...DEFAULT_STATE };
@@ -955,7 +707,9 @@ export function initExtension(platformSelectors) {
     currentState = normalizeState({ ...currentState, ...state });
     const { responseDir, composerDir, mathFix, fontFix, claudeDarkSurface: nextClaudeDarkSurface } = currentState;
 
-    injectCustomFont();
+    void updateFont(currentState);
+
+    if (isChatGPT) document.body?.classList.add('gptgate-platform-chatgpt');
 
     // Toggle font class
     document.body?.classList.toggle('gptgate-use-font', !!fontFix);
@@ -974,11 +728,11 @@ export function initExtension(platformSelectors) {
 
     ensureFloatingPanel();
     if (isGemini) scheduleGeminiPlacement();
-    if (isClaude || isChatGPT) updatePanelPlacement();
+    if (isClaude) updatePanelPlacement();
   }
 
   function retryPanelPlacementDuringBoot() {
-    if (!isClaude && !isChatGPT) return;
+    if (!isClaude) return;
     [50, 180, 500, 1100].forEach((delay) => {
       setTimeout(() => {
         if (isContextInvalidated()) return;
@@ -1006,7 +760,32 @@ export function initExtension(platformSelectors) {
     }
     if (isClaude) {
       document.body.classList.add('gptgate-platform-claude');
-      setClaudeDarkSurface(true);
+      setClaudeDarkSurface(DEFAULT_STATE.claudeDarkSurface);
+    }
+
+    if (isChatGPT) {
+      // Hydration can replace body or reset its class attribute after document_start.
+      const stateObserver = new MutationObserver(() => {
+        if (isContextInvalidated()) { stateObserver.disconnect(); return; }
+        const body = document.body;
+        const expected = ['gptgate-platform-chatgpt', `gptgate-${currentState.responseDir}-response`, `gptgate-${currentState.composerDir}-composer`];
+        if (currentState.fontFix) expected.push('gptgate-use-font');
+        if (currentState.mathFix || currentState.responseDir === 'rtl' || currentState.composerDir === 'rtl') expected.push('gptgate-math-fix');
+        if (body && expected.some(name => !body.classList.contains(name))) applyState({}, 'body-state-restored');
+      });
+      let observedBody = document.body;
+      const observeBody = () => {
+        if (!document.body || document.body === observedBody) return;
+        observedBody = document.body;
+        stateObserver.disconnect();
+        if (document.body) {
+          stateObserver.observe(document.body, {attributes:true,attributeFilter:['class']});
+          applyState({}, 'body-replaced');
+        }
+      };
+      const bodyObserver = new MutationObserver(observeBody);
+      bodyObserver.observe(document.documentElement, {childList:true});
+      stateObserver.observe(document.body, {attributes:true,attributeFilter:['class']});
     }
 
     applyState(DEFAULT_STATE, 'default-init');
@@ -1022,9 +801,6 @@ export function initExtension(platformSelectors) {
       });
       geminiObserver.observe(document.body, { childList: true, subtree: true });
 
-      setInterval(() => {
-        scheduleGeminiPlacement();
-      }, 2500);
     }
     if (isClaude) {
       schedulePanelPlacement();
@@ -1041,43 +817,18 @@ export function initExtension(platformSelectors) {
       });
       claudeMutObs.observe(document.body, { childList: true, subtree: true });
 
-      // Fallback poll — the resize event / ResizeObserver can miss transitions
-      // (e.g. rapid window resizes), leaving the panel stuck over the composer.
-      setInterval(() => {
-        if (isContextInvalidated()) return;
-        updatePanelPlacement();
-      }, 2000);
-    }
-    if (isChatGPT) {
-      schedulePanelPlacement();
-
-      chatGPTBodyResizeObserver = new ResizeObserver(() => {
-        schedulePanelPlacementDebounced();
-      });
-      chatGPTBodyResizeObserver.observe(document.body);
-
-      const chatGPTMutObs = new MutationObserver(() => {
-        schedulePanelPlacementDebounced();
-      });
-      chatGPTMutObs.observe(document.body, { childList: true, subtree: true });
-
-      // Fallback poll — same rationale as Claude above.
-      setInterval(() => {
-        if (isContextInvalidated()) return;
-        updatePanelPlacement();
-      }, 2000);
+      // Resize, body resize and DOM observers already schedule placement.
+      // No idle poll: late layout transitions are covered by their end event.
+      document.addEventListener('transitionend', schedulePanelPlacementDebounced);
     }
 
     try {
       if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
         chrome.storage.sync.get(
-          ['responseDir', 'composerDir', 'mathFix', 'fontFix', 'rtlResponses', 'rtlComposer', CLAUDE_DARK_SURFACE_KEY],
+          [...Object.keys(DEFAULT_STATE), 'rtlResponses', 'rtlComposer'],
           (state) => {
             if (isContextInvalidated()) return;
             applyState(state || {}, 'initial');
-            if (isClaude && state && CLAUDE_DARK_SURFACE_KEY in state) {
-              setClaudeDarkSurface(state[CLAUDE_DARK_SURFACE_KEY]);
-            }
           }
         );
       }
@@ -1089,8 +840,10 @@ export function initExtension(platformSelectors) {
       if (typeof chrome !== 'undefined' && chrome?.storage?.onChanged) {
         chrome.storage.onChanged.addListener((changes, area) => {
           if (isContextInvalidated()) return;
+          if (area === 'local' && CUSTOM_FONT_KEY in changes) void updateFont(currentState, true);
           if (area !== 'sync') return;
           const upd = {};
+          for (const key of ['fontFamily','fontWeight',CLAUDE_DARK_SURFACE_KEY]) if (key in changes) upd[key] = changes[key].newValue;
           if ('responseDir' in changes) upd.responseDir = changes.responseDir.newValue;
           if ('composerDir' in changes) upd.composerDir = changes.composerDir.newValue;
           if ('mathFix' in changes) upd.mathFix = changes.mathFix.newValue;
@@ -1098,9 +851,6 @@ export function initExtension(platformSelectors) {
           if ('rtlResponses' in changes) upd.rtlResponses = changes.rtlResponses.newValue;
           if ('rtlComposer' in changes) upd.rtlComposer = changes.rtlComposer.newValue;
           if (Object.keys(upd).length) applyState(upd, 'storage-change');
-          if (isClaude && CLAUDE_DARK_SURFACE_KEY in changes) {
-            setClaudeDarkSurface(changes[CLAUDE_DARK_SURFACE_KEY].newValue);
-          }
         });
       }
     } catch (err) {
@@ -1123,13 +873,13 @@ export function initExtension(platformSelectors) {
     }
 
     watchDynamicContent({
-      root: document.body,
+      root: isChatGPT ? document.documentElement : document.body,
       onChange: (mutations) => {
         if (isContextInvalidated()) {
           handleInvalidation();
           return;
         }
-        if (isClaude || isChatGPT) {
+        if (isClaude) {
           if (!document.getElementById(PANEL_ID)) ensureFloatingPanel();
           else schedulePanelPlacementDebounced();
         }
@@ -1146,7 +896,7 @@ export function initExtension(platformSelectors) {
           updateFloatingPanelLayout();
           hideGeminiDisclaimer();
           if (isGemini) scheduleGeminiPlacement();
-          if (isClaude || isChatGPT) schedulePanelPlacementDebounced();
+          if (isClaude) schedulePanelPlacementDebounced();
         }, 220);
       },
     });
@@ -1164,6 +914,7 @@ export function initExtension(platformSelectors) {
       el.id === PANEL_STYLE_ID ||
       el.id === STYLE_ID ||
       el.id === FONT_STYLE_ID ||
+      el.localName === 'gptgate-export-tools' ||
       !!el.closest?.(`#${PANEL_ID}`)
     );
   }
@@ -1208,7 +959,7 @@ export function initExtension(platformSelectors) {
     }
     updateFloatingPanelLayout();
     if (isGemini) scheduleGeminiPlacement();
-    if (isClaude || isChatGPT) schedulePanelPlacementDebounced();
+    if (isClaude) schedulePanelPlacementDebounced();
   };
 
   handleVisibilityChange = () => {
@@ -1218,7 +969,7 @@ export function initExtension(platformSelectors) {
     }
     if (!document.hidden) {
       updateFloatingPanelLayout();
-      if (isClaude || isChatGPT) updatePanelPlacement();
+      if (isClaude) updatePanelPlacement();
       applyState({}, 'visibility-change');
     }
   };

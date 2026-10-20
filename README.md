@@ -1,116 +1,170 @@
 <div align="center">
   <img src="images/logo.png" width="112" alt="GptGate logo">
   <h1>GptGate Browser Extension</h1>
-  <p>Better Persian and bidirectional text in ChatGPT, Gemini, and Claude.</p>
+  <p>Persian direction, reading fonts, and local ChatGPT PDF export.</p>
   <p><a href="README.fa.md">فارسی</a> · <strong>English</strong></p>
 </div>
 
-## About GptGate
-
-AI chat interfaces do not always handle Persian, English, and math well when they appear together. Text alignment shifts, punctuation feels out of place, and formulas can become difficult to read.
-
-GptGate fixes these issues inside the AI tools you already use. It gives you control over the direction of responses and the message composer while keeping mixed-language content and mathematical notation readable.
-
-GptGate currently uses Chrome Manifest V3. The current version is `0.1.1`.
+GptGate helps Persian speakers read and write mixed Persian, English, and math
+in ChatGPT, Gemini, and Claude. It uses Chrome Manifest V3; the package version
+is 0.1.1. No GptGate account or login is required.
 
 ## Features
 
-- Separate `RTL`, `LTR`, and automatic direction controls for responses and the composer
-- Smart direction detection for Persian and English text
-- Improved KaTeX and MathJax rendering inside right-to-left content
-- IRANSansX font support for more readable Persian text
-- A dedicated dark surface option for Claude
-- Settings saved locally in your browser
-- Changes applied to supported tabs without interrupting your conversation
+- Separate right, left, and automatic direction controls for responses and composer.
+- Existing math correction for right-to-left content and a Claude-only dark surface.
+- IRANSansX, Vazirmatn, Shabnam, Sahel, and a custom local conversation font;
+  available weight choices and an in-popup mixed-language sample.
+- ChatGPT PDF preview for an individual assistant response or the available
+  conversation branch, finished with the browser's native Save as PDF.
+- Windows-style popup controls and motion with the supplied Persian brand artwork.
+- Automatic preference saving, keyboard focus, reduced motion, and recovery feedback.
 
-## Supported services
-
-| Service | Website |
-| --- | --- |
-| ChatGPT | `chatgpt.com` and `chat.openai.com` |
-| Gemini | `gemini.google.com` |
-| Claude | `claude.ai` |
+| Service | Websites | Direction and fonts | PDF preview |
+| --- | --- | --- | --- |
+| ChatGPT | chatgpt.com, chat.openai.com | Yes | Response and conversation |
+| Gemini | gemini.google.com | Yes | No |
+| Claude | claude.ai | Yes; existing black-surface option | No |
 
 ## Install from source
 
-You will need:
-
-- Node.js 18 or newer
-- npm
-- A Chromium-based browser such as Google Chrome or Microsoft Edge
-
-Install the dependencies and create a production build:
+Use Node.js 22 or newer, npm, and a Chromium browser. Validation used Node.js
+24.21 and Chromium 140; the earlier broad Node 18+ requirement is unverified.
 
 ```bash
 npm ci
 npm run build
 ```
 
-Load the extension in Chrome:
+1. Open chrome://extensions (or edge://extensions).
+2. Enable Developer mode and choose Load unpacked.
+3. Select the generated dist folder.
+4. Reload any already open supported-site tabs after loading or reloading dist.
 
-1. Open `chrome://extensions`.
-2. Turn on **Developer mode**.
-3. Select **Load unpacked**.
-4. Choose the generated `dist` folder.
+## Direction and reading preferences
 
-For Microsoft Edge, follow the same steps from `edge://extensions`.
+Open a supported site, then open GptGate from the browser toolbar. Choose each
+text direction independently. When either direction is forced right-to-left,
+the existing engine requires math correction: the popup displays it as enabled
+and explains why its switch is disabled. The stored math choice remains available
+for automatic/left-to-right modes.
 
-## Using GptGate
+The sun/moon switch changes only the popup. The separate Claude black-surface
+preference applies only to Claude. The idle ready sentence is omitted; saving,
+warning, and failure messages still describe the result of an action.
 
-Open ChatGPT, Gemini, or Claude and select the GptGate icon from your browser toolbar. Response direction and composer direction can each be set to `RTL`, `LTR`, or automatic mode. Advanced settings include math rendering, the Persian font, and the Claude dark surface.
+## Choose a font
 
-Your choices are saved automatically and applied to supported tabs.
+1. Enable the conversation-font switch and expand the font/weight section.
+2. Choose a family and an available weight; inspect the Persian/English sample.
+3. To use your own face, select the upload action and choose WOFF2, WOFF, TTF,
+   or OTF, at most 2 MiB. The browser must successfully parse the font.
 
-## Development
+Custom fonts expose their uploaded face at weight 400. Their bytes stay on this
+device in chrome.storage.local; only family and weight choices sync. A synced
+custom choice without a local file falls back to Vazirmatn. Removing the uploaded
+font is available in the same section. Selected fonts target message/composer
+text, while native buttons, code, math, and icons retain their own rendering.
+The popup interface continues to use its Windows fonts. See
+[font files and provenance](fonts/README.md).
 
-Start the development server:
+ChatGPT sidebar conversation/project titles also use the selected family while
+keeping the native interface weight. Titles align right without moving the
+sidebar or its controls. Mixed-language titles retain their natural first-letter
+reading direction; an English prefix is not forced to the end by RTL layout.
+Native scrolling of long titles is preserved. Turning off font correction
+restores the native title font.
+
+Home-page reminders/suggestions also align their text right and use the selected
+font family at native weight. Natural bidi resolution keeps Persian, English,
+numbers and inline links in reading order without moving icons or row actions.
+
+## Save ChatGPT content as PDF or Word
+
+1. Open the PDF menu in the ChatGPT conversation header. Choose the whole
+   conversation, or Select response: click an answer (or use Previous/Next),
+   then choose Export selected response. Escape or Cancel exits selection.
+2. For a conversation, allow the temporary top-to-bottom collection to finish.
+   Use Cancel, or scroll/touch/use a navigation key to stop it.
+3. Inspect the extension preview: check the message count, beginning/end,
+   missing-image notes, and any incomplete-collection warning.
+4. Choose the PDF action and select Save as PDF in the browser dialog, or choose
+   Download Word to save a real `.docx` file locally.
+
+Word preserves editable text, lists, tables, code and supported MathML formulas.
+Fonts are not embedded: install the selected family on the device opening the
+file for consistent typography. Uploaded custom fonts use Tahoma in Word.
+Browser layout and Word pagination can differ; inspect the file before sharing.
+The converter loads only after choosing Word, not while browsing ChatGPT.
+
+Collection reads the currently available branch from the page DOM, with no
+conversation API. It restores the original scroll position if the route remains
+the same. It stops at 20 seconds, 500 messages, or the serialized-content cap;
+hidden or unavailable history is not guaranteed. Only already loaded images
+whose pixels the browser permits are included, within the image-size cap;
+protected or large images become text placeholders. Native MathML is retained
+where available. See [the measured scope and limits](docs/font-pdf-validation.md).
+
+## First-use help
+
+New installations offer a short export tip in ChatGPT when the composer is not
+focused, and three arrow tips on the first popup opening: direction, fonts and
+math. Skip or finish to dismiss them. Replay from Help in the popup or Export
+help in the ChatGPT export menu. Completion is local to the device; updates do
+not restart the guide. No account is required.
+
+## Storage and privacy
+
+Preferences use chrome.storage.sync, so Chrome may sync them when browser sync
+is enabled. The popup theme uses localStorage. Custom font bytes use
+chrome.storage.local. PDF payloads use chrome.storage.session with at most two
+recent previews; older entries are pruned when a new preview is created and
+session data clears when Chrome closes. Export does not send conversations to
+an account, API, or export server. Image export uses already loaded pixels and
+does not fetch missing images. The Telegram action opens only when chosen.
+
+Storage and scripting permissions support preferences and supported-site
+integration. Host access is restricted to the supported services. Broad tabs
+permission was removed during store preparation; unrelated tab URLs are not
+needed. Third-party software notices ship in THIRD_PARTY_NOTICES.txt.
+
+## Development and validation
 
 ```bash
 npm run dev
+npm test
+npm run test:performance
 ```
 
-Create a production build:
+Install Playwright's Chromium if it is not already available:
 
 ```bash
-npm run build
+npx playwright install chromium
 ```
 
-The production-ready extension is generated in `dist`.
+Tests build the production extension, check preserved scope and Windows motion,
+exercise popup/font/storage/export failures, and load the real MV3 extension on
+three isolated supported-origin fixtures. Actual PDF fixtures include Persian,
+code, and math. They do not certify compatibility with current live accounts or
+every remote website revision. Performance tests compare the original 244006e
+baseline with current code and write results under artifacts/qa/; measured
+increases and limits are reported in [current validation](docs/font-pdf-validation.md).
+The [earlier popup-port report](docs/popup-validation.md) preserves historical figures.
+See [Word and onboarding validation](docs/onboarding-word-validation.md) for the
+new export, first-install behavior, live Chrome checks and scoped performance comparison.
 
 ## Project structure
 
-```text
-gptgate-browser-extension/
-├── manifest.json          # Manifest V3 configuration
-├── background.js          # Extension service worker
-├── popup.html             # Extension popup interface
-├── popup.js               # Popup settings and interactions
-├── src/
-│   ├── shared/            # Shared behavior and settings
-│   ├── chatgpt/           # ChatGPT integration
-│   ├── gemini/            # Gemini integration
-│   └── claude/            # Claude integration
-├── images/                # Extension artwork
-└── fonts/                 # Bundled interface font
-```
+- popup.html / popup.css / popup.js: popup preferences and font sample.
+- background.js: existing worker behavior and bounded local PDF preview handling.
+- src/shared/: direction/math/font integration and export sanitization/collection.
+- src/chatgpt/: ChatGPT integration and scoped PDF actions.
+- src/gemini/ and src/claude/: existing supported-site integrations.
+- export.html / export.css / export.js: local preview and native print action.
+- export-docx.js: lazily loaded local Word conversion.
+- popup-tips.js / src/shared/tips.js: first-use guidance and replay.
+- fonts/: bundled faces, source mapping, and open-font licenses.
+- images/: supplied brand artwork; see [asset provenance](images/README.md).
 
-## Browser permissions
-
-GptGate asks only for the permissions needed to work on supported AI websites:
-
-- `storage` keeps your preferences in the browser.
-- `tabs` identifies supported tabs and applies setting changes.
-- `scripting` restores the extension when a supported tab needs to be reconnected.
-- Host access is limited to ChatGPT, Gemini, and Claude domains.
-
-## Privacy
-
-GptGate does not send your conversations or preferences to an external server. Your settings stay in browser storage. The GptGate Telegram link opens only when you choose it.
-
-## Contributing
-
-Bug reports, suggestions, and pull requests are welcome. If a supported website changes its interface and something stops working, opening an issue with the website name and a short description is especially helpful.
-
-## Community
-
-News and updates are available on the [GptGate Telegram channel](https://t.me/GptGateAI).
+Bug reports should name the affected service and describe the trigger. Community
+updates are available on the [GptGate Telegram channel](https://t.me/GptGateAI).

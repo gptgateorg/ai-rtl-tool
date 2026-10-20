@@ -4,4 +4,5 @@ import manifest from './manifest.json' with { type: 'json' };
 
 export default defineConfig({
   plugins: [crx({ manifest })],
+  build: { rollupOptions: { input: { export: 'export.html' } } },
 });

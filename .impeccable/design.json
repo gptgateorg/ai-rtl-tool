@@ -1,0 +1,709 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T09:29:06.080314+00:00",
+  "title": "Design System: GptGate Persian Tool Popup",
+  "extensions": {
+    "colorMeta": {
+      "light-bg": {
+        "role": "neutral",
+        "displayName": "Light Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0278 171.2)",
+          "oklch(26% 0.0278 171.2)",
+          "oklch(38% 0.0278 171.2)",
+          "oklch(49% 0.0278 171.2)",
+          "oklch(61% 0.0278 171.2)",
+          "oklch(72% 0.0278 171.2)",
+          "oklch(84% 0.0278 171.2)",
+          "oklch(95% 0.0278 171.2)"
+        ]
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.0)",
+          "oklch(26% 0.0000 0.0)",
+          "oklch(38% 0.0000 0.0)",
+          "oklch(49% 0.0000 0.0)",
+          "oklch(61% 0.0000 0.0)",
+          "oklch(72% 0.0000 0.0)",
+          "oklch(84% 0.0000 0.0)",
+          "oklch(95% 0.0000 0.0)"
+        ]
+      },
+      "light-surface-2": {
+        "role": "neutral",
+        "displayName": "Light Surface 2",
+        "tonalRamp": [
+          "oklch(15% 0.0278 171.2)",
+          "oklch(26% 0.0278 171.2)",
+          "oklch(38% 0.0278 171.2)",
+          "oklch(49% 0.0278 171.2)",
+          "oklch(61% 0.0278 171.2)",
+          "oklch(72% 0.0278 171.2)",
+          "oklch(84% 0.0278 171.2)",
+          "oklch(95% 0.0278 171.2)"
+        ]
+      },
+      "light-surface-3": {
+        "role": "neutral",
+        "displayName": "Light Surface 3",
+        "tonalRamp": [
+          "oklch(15% 0.0580 171.3)",
+          "oklch(26% 0.0580 171.3)",
+          "oklch(38% 0.0580 171.3)",
+          "oklch(49% 0.0580 171.3)",
+          "oklch(61% 0.0580 171.3)",
+          "oklch(72% 0.0580 171.3)",
+          "oklch(84% 0.0580 171.3)",
+          "oklch(95% 0.0580 171.3)"
+        ]
+      },
+      "light-brand": {
+        "role": "primary",
+        "displayName": "Light Brand",
+        "tonalRamp": [
+          "oklch(15% 0.1027 169.9)",
+          "oklch(26% 0.1027 169.9)",
+          "oklch(38% 0.1027 169.9)",
+          "oklch(49% 0.1027 169.9)",
+          "oklch(61% 0.1027 169.9)",
+          "oklch(72% 0.1027 169.9)",
+          "oklch(84% 0.1027 169.9)",
+          "oklch(95% 0.1027 169.9)"
+        ]
+      },
+      "light-accent": {
+        "role": "primary",
+        "displayName": "Light Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0786 172.9)",
+          "oklch(26% 0.0786 172.9)",
+          "oklch(38% 0.0786 172.9)",
+          "oklch(49% 0.0786 172.9)",
+          "oklch(61% 0.0786 172.9)",
+          "oklch(72% 0.0786 172.9)",
+          "oklch(84% 0.0786 172.9)",
+          "oklch(95% 0.0786 172.9)"
+        ]
+      },
+      "light-accent-soft": {
+        "role": "neutral",
+        "displayName": "Light Accent Soft",
+        "tonalRamp": [
+          "oklch(15% 0.0580 171.3)",
+          "oklch(26% 0.0580 171.3)",
+          "oklch(38% 0.0580 171.3)",
+          "oklch(49% 0.0580 171.3)",
+          "oklch(61% 0.0580 171.3)",
+          "oklch(72% 0.0580 171.3)",
+          "oklch(84% 0.0580 171.3)",
+          "oklch(95% 0.0580 171.3)"
+        ]
+      },
+      "light-on-accent-soft": {
+        "role": "neutral",
+        "displayName": "Light On Accent Soft",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "light-action": {
+        "role": "primary",
+        "displayName": "Light Action",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "light-on-action": {
+        "role": "primary",
+        "displayName": "Light On Action",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.0)",
+          "oklch(26% 0.0000 0.0)",
+          "oklch(38% 0.0000 0.0)",
+          "oklch(49% 0.0000 0.0)",
+          "oklch(61% 0.0000 0.0)",
+          "oklch(72% 0.0000 0.0)",
+          "oklch(84% 0.0000 0.0)",
+          "oklch(95% 0.0000 0.0)"
+        ]
+      },
+      "light-text": {
+        "role": "neutral",
+        "displayName": "Light Text",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "light-text-muted": {
+        "role": "neutral",
+        "displayName": "Light Text Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0436 178.7)",
+          "oklch(26% 0.0436 178.7)",
+          "oklch(38% 0.0436 178.7)",
+          "oklch(49% 0.0436 178.7)",
+          "oklch(61% 0.0436 178.7)",
+          "oklch(72% 0.0436 178.7)",
+          "oklch(84% 0.0436 178.7)",
+          "oklch(95% 0.0436 178.7)"
+        ]
+      },
+      "light-text-subtle": {
+        "role": "neutral",
+        "displayName": "Light Text Subtle",
+        "tonalRamp": [
+          "oklch(15% 0.0436 178.7)",
+          "oklch(26% 0.0436 178.7)",
+          "oklch(38% 0.0436 178.7)",
+          "oklch(49% 0.0436 178.7)",
+          "oklch(61% 0.0436 178.7)",
+          "oklch(72% 0.0436 178.7)",
+          "oklch(84% 0.0436 178.7)",
+          "oklch(95% 0.0436 178.7)"
+        ]
+      },
+      "light-border": {
+        "role": "neutral",
+        "displayName": "Light Border",
+        "tonalRamp": [
+          "oklch(15% 0.0580 171.3)",
+          "oklch(26% 0.0580 171.3)",
+          "oklch(38% 0.0580 171.3)",
+          "oklch(49% 0.0580 171.3)",
+          "oklch(61% 0.0580 171.3)",
+          "oklch(72% 0.0580 171.3)",
+          "oklch(84% 0.0580 171.3)",
+          "oklch(95% 0.0580 171.3)"
+        ]
+      },
+      "light-border-strong": {
+        "role": "neutral",
+        "displayName": "Light Border Strong",
+        "tonalRamp": [
+          "oklch(15% 0.0307 179.7)",
+          "oklch(26% 0.0307 179.7)",
+          "oklch(38% 0.0307 179.7)",
+          "oklch(49% 0.0307 179.7)",
+          "oklch(61% 0.0307 179.7)",
+          "oklch(72% 0.0307 179.7)",
+          "oklch(84% 0.0307 179.7)",
+          "oklch(95% 0.0307 179.7)"
+        ]
+      },
+      "light-danger": {
+        "role": "neutral",
+        "displayName": "Light Danger",
+        "tonalRamp": [
+          "oklch(15% 0.1486 37.7)",
+          "oklch(26% 0.1486 37.7)",
+          "oklch(38% 0.1486 37.7)",
+          "oklch(49% 0.1486 37.7)",
+          "oklch(61% 0.1486 37.7)",
+          "oklch(72% 0.1486 37.7)",
+          "oklch(84% 0.1486 37.7)",
+          "oklch(95% 0.1486 37.7)"
+        ]
+      },
+      "light-danger-soft": {
+        "role": "neutral",
+        "displayName": "Light Danger Soft",
+        "tonalRamp": [
+          "oklch(15% 0.0332 46.4)",
+          "oklch(26% 0.0332 46.4)",
+          "oklch(38% 0.0332 46.4)",
+          "oklch(49% 0.0332 46.4)",
+          "oklch(61% 0.0332 46.4)",
+          "oklch(72% 0.0332 46.4)",
+          "oklch(84% 0.0332 46.4)",
+          "oklch(95% 0.0332 46.4)"
+        ]
+      },
+      "light-feature-bg": {
+        "role": "neutral",
+        "displayName": "Light Feature Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "light-on-feature-active": {
+        "role": "neutral",
+        "displayName": "Light On Feature Active",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Dark Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0309 176.9)",
+          "oklch(26% 0.0309 176.9)",
+          "oklch(38% 0.0309 176.9)",
+          "oklch(49% 0.0309 176.9)",
+          "oklch(61% 0.0309 176.9)",
+          "oklch(72% 0.0309 176.9)",
+          "oklch(84% 0.0309 176.9)",
+          "oklch(95% 0.0309 176.9)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0399 176.6)",
+          "oklch(26% 0.0399 176.6)",
+          "oklch(38% 0.0399 176.6)",
+          "oklch(49% 0.0399 176.6)",
+          "oklch(61% 0.0399 176.6)",
+          "oklch(72% 0.0399 176.6)",
+          "oklch(84% 0.0399 176.6)",
+          "oklch(95% 0.0399 176.6)"
+        ]
+      },
+      "dark-surface-2": {
+        "role": "neutral",
+        "displayName": "Dark Surface 2",
+        "tonalRamp": [
+          "oklch(15% 0.0309 176.9)",
+          "oklch(26% 0.0309 176.9)",
+          "oklch(38% 0.0309 176.9)",
+          "oklch(49% 0.0309 176.9)",
+          "oklch(61% 0.0309 176.9)",
+          "oklch(72% 0.0309 176.9)",
+          "oklch(84% 0.0309 176.9)",
+          "oklch(95% 0.0309 176.9)"
+        ]
+      },
+      "dark-surface-3": {
+        "role": "neutral",
+        "displayName": "Dark Surface 3",
+        "tonalRamp": [
+          "oklch(15% 0.0643 178.3)",
+          "oklch(26% 0.0643 178.3)",
+          "oklch(38% 0.0643 178.3)",
+          "oklch(49% 0.0643 178.3)",
+          "oklch(61% 0.0643 178.3)",
+          "oklch(72% 0.0643 178.3)",
+          "oklch(84% 0.0643 178.3)",
+          "oklch(95% 0.0643 178.3)"
+        ]
+      },
+      "dark-brand": {
+        "role": "primary",
+        "displayName": "Dark Brand",
+        "tonalRamp": [
+          "oklch(15% 0.1027 169.9)",
+          "oklch(26% 0.1027 169.9)",
+          "oklch(38% 0.1027 169.9)",
+          "oklch(49% 0.1027 169.9)",
+          "oklch(61% 0.1027 169.9)",
+          "oklch(72% 0.1027 169.9)",
+          "oklch(84% 0.1027 169.9)",
+          "oklch(95% 0.1027 169.9)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Dark Accent",
+        "tonalRamp": [
+          "oklch(15% 0.1027 169.9)",
+          "oklch(26% 0.1027 169.9)",
+          "oklch(38% 0.1027 169.9)",
+          "oklch(49% 0.1027 169.9)",
+          "oklch(61% 0.1027 169.9)",
+          "oklch(72% 0.1027 169.9)",
+          "oklch(84% 0.1027 169.9)",
+          "oklch(95% 0.1027 169.9)"
+        ]
+      },
+      "dark-accent-soft": {
+        "role": "neutral",
+        "displayName": "Dark Accent Soft",
+        "tonalRamp": [
+          "oklch(15% 0.0643 178.3)",
+          "oklch(26% 0.0643 178.3)",
+          "oklch(38% 0.0643 178.3)",
+          "oklch(49% 0.0643 178.3)",
+          "oklch(61% 0.0643 178.3)",
+          "oklch(72% 0.0643 178.3)",
+          "oklch(84% 0.0643 178.3)",
+          "oklch(95% 0.0643 178.3)"
+        ]
+      },
+      "dark-on-accent-soft": {
+        "role": "neutral",
+        "displayName": "Dark On Accent Soft",
+        "tonalRamp": [
+          "oklch(15% 0.0278 171.2)",
+          "oklch(26% 0.0278 171.2)",
+          "oklch(38% 0.0278 171.2)",
+          "oklch(49% 0.0278 171.2)",
+          "oklch(61% 0.0278 171.2)",
+          "oklch(72% 0.0278 171.2)",
+          "oklch(84% 0.0278 171.2)",
+          "oklch(95% 0.0278 171.2)"
+        ]
+      },
+      "dark-action": {
+        "role": "primary",
+        "displayName": "Dark Action",
+        "tonalRamp": [
+          "oklch(15% 0.1027 169.9)",
+          "oklch(26% 0.1027 169.9)",
+          "oklch(38% 0.1027 169.9)",
+          "oklch(49% 0.1027 169.9)",
+          "oklch(61% 0.1027 169.9)",
+          "oklch(72% 0.1027 169.9)",
+          "oklch(84% 0.1027 169.9)",
+          "oklch(95% 0.1027 169.9)"
+        ]
+      },
+      "dark-on-action": {
+        "role": "primary",
+        "displayName": "Dark On Action",
+        "tonalRamp": [
+          "oklch(15% 0.0309 176.9)",
+          "oklch(26% 0.0309 176.9)",
+          "oklch(38% 0.0309 176.9)",
+          "oklch(49% 0.0309 176.9)",
+          "oklch(61% 0.0309 176.9)",
+          "oklch(72% 0.0309 176.9)",
+          "oklch(84% 0.0309 176.9)",
+          "oklch(95% 0.0309 176.9)"
+        ]
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Dark Text",
+        "tonalRamp": [
+          "oklch(15% 0.0278 171.2)",
+          "oklch(26% 0.0278 171.2)",
+          "oklch(38% 0.0278 171.2)",
+          "oklch(49% 0.0278 171.2)",
+          "oklch(61% 0.0278 171.2)",
+          "oklch(72% 0.0278 171.2)",
+          "oklch(84% 0.0278 171.2)",
+          "oklch(95% 0.0278 171.2)"
+        ]
+      },
+      "dark-text-muted": {
+        "role": "neutral",
+        "displayName": "Dark Text Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0580 171.3)",
+          "oklch(26% 0.0580 171.3)",
+          "oklch(38% 0.0580 171.3)",
+          "oklch(49% 0.0580 171.3)",
+          "oklch(61% 0.0580 171.3)",
+          "oklch(72% 0.0580 171.3)",
+          "oklch(84% 0.0580 171.3)",
+          "oklch(95% 0.0580 171.3)"
+        ]
+      },
+      "dark-text-subtle": {
+        "role": "neutral",
+        "displayName": "Dark Text Subtle",
+        "tonalRamp": [
+          "oklch(15% 0.0429 176.7)",
+          "oklch(26% 0.0429 176.7)",
+          "oklch(38% 0.0429 176.7)",
+          "oklch(49% 0.0429 176.7)",
+          "oklch(61% 0.0429 176.7)",
+          "oklch(72% 0.0429 176.7)",
+          "oklch(84% 0.0429 176.7)",
+          "oklch(95% 0.0429 176.7)"
+        ]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Dark Border",
+        "tonalRamp": [
+          "oklch(15% 0.0512 176.0)",
+          "oklch(26% 0.0512 176.0)",
+          "oklch(38% 0.0512 176.0)",
+          "oklch(49% 0.0512 176.0)",
+          "oklch(61% 0.0512 176.0)",
+          "oklch(72% 0.0512 176.0)",
+          "oklch(84% 0.0512 176.0)",
+          "oklch(95% 0.0512 176.0)"
+        ]
+      },
+      "dark-border-strong": {
+        "role": "neutral",
+        "displayName": "Dark Border Strong",
+        "tonalRamp": [
+          "oklch(15% 0.0786 172.9)",
+          "oklch(26% 0.0786 172.9)",
+          "oklch(38% 0.0786 172.9)",
+          "oklch(49% 0.0786 172.9)",
+          "oklch(61% 0.0786 172.9)",
+          "oklch(72% 0.0786 172.9)",
+          "oklch(84% 0.0786 172.9)",
+          "oklch(95% 0.0786 172.9)"
+        ]
+      },
+      "dark-danger": {
+        "role": "neutral",
+        "displayName": "Dark Danger",
+        "tonalRamp": [
+          "oklch(15% 0.1382 43.9)",
+          "oklch(26% 0.1382 43.9)",
+          "oklch(38% 0.1382 43.9)",
+          "oklch(49% 0.1382 43.9)",
+          "oklch(61% 0.1382 43.9)",
+          "oklch(72% 0.1382 43.9)",
+          "oklch(84% 0.1382 43.9)",
+          "oklch(95% 0.1382 43.9)"
+        ]
+      },
+      "dark-danger-soft": {
+        "role": "neutral",
+        "displayName": "Dark Danger Soft",
+        "tonalRamp": [
+          "oklch(15% 0.1382 43.9)",
+          "oklch(26% 0.1382 43.9)",
+          "oklch(38% 0.1382 43.9)",
+          "oklch(49% 0.1382 43.9)",
+          "oklch(61% 0.1382 43.9)",
+          "oklch(72% 0.1382 43.9)",
+          "oklch(84% 0.1382 43.9)",
+          "oklch(95% 0.1382 43.9)"
+        ]
+      },
+      "dark-feature-bg": {
+        "role": "neutral",
+        "displayName": "Dark Feature Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      },
+      "dark-on-feature-active": {
+        "role": "neutral",
+        "displayName": "Dark On Feature Active",
+        "tonalRamp": [
+          "oklch(15% 0.0514 177.0)",
+          "oklch(26% 0.0514 177.0)",
+          "oklch(38% 0.0514 177.0)",
+          "oklch(49% 0.0514 177.0)",
+          "oklch(61% 0.0514 177.0)",
+          "oklch(72% 0.0514 177.0)",
+          "oklch(84% 0.0514 177.0)",
+          "oklch(95% 0.0514 177.0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Brand heading."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Direction headings and preference labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default body copy."
+      },
+      "hint": {
+        "displayName": "Hint",
+        "purpose": "Preference descriptions."
+      },
+      "segment": {
+        "displayName": "Segment",
+        "purpose": "Three direction option labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "light-card",
+        "value": "0 16px 36px -26px rgba(13, 59, 50, 0.28)",
+        "purpose": "Light opaque settings panel."
+      },
+      {
+        "name": "dark-card",
+        "value": "0 10px 30px -18px rgba(0, 0, 0, 0.7)",
+        "purpose": "Dark opaque settings panel."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fast",
+        "value": "150ms",
+        "purpose": "Small color and community-action states."
+      },
+      {
+        "name": "brand-ease",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "Community press and segment-button states."
+      },
+      {
+        "name": "direction-capsule",
+        "value": "360ms cubic-bezier(0.22, 1.15, 0.36, 1)",
+        "purpose": "One-third-width capsule; interruptible transform."
+      },
+      {
+        "name": "switch-thumb",
+        "value": "360ms cubic-bezier(0.22, 1.15, 0.36, 1)",
+        "purpose": "28px checked travel, reversed in RTL."
+      },
+      {
+        "name": "switch-fill",
+        "value": "180ms ease",
+        "purpose": "Track and thumb colors."
+      },
+      {
+        "name": "theme-morph",
+        "value": "380ms cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "48px travel and source sun/moon morph."
+      },
+      {
+        "name": "theme-ray-opacity",
+        "value": "180ms ease",
+        "purpose": "Sun-ray disappearance."
+      },
+      {
+        "name": "instant",
+        "value": "none",
+        "purpose": "Initial restoration, keyboard input, and reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-popup",
+        "value": "389px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Direction Choice",
+      "kind": "custom",
+      "refersTo": "direction-group",
+      "description": "Three physically ordered direction options; automatic shown selected.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"جهت پاسخ\" data-value=\"auto\"><button aria-pressed=\"false\">چپ‌چین</button><button class=\"ds-active\" aria-pressed=\"true\">خودکار</button><button aria-pressed=\"false\">راست‌چین</button></div>",
+      "css": ".ds-seg {\n    --selection-motion: 360ms;\n    position: relative;\n    display: grid;\n    grid-template-columns: repeat(3, minmax(72px, 1fr));\n    direction: ltr;\n    isolation: isolate;\n    gap: 0;\n    padding: 4px;\n    background: var(--surface-2, #DFF7EE);\n    border-radius: var(--radius-pill, 999px);\n}\n\n.ds-seg::before {\n    content: \"\";\n    position: absolute;\n    z-index: -1;\n    inset: 4px auto 4px 4px;\n    width: calc((100% - 8px) / 3);\n    border-radius: var(--radius-pill, 999px);\n    background: var(--action, #0D3B32);\n    transform: translateX(var(--selection-x, 0%));\n    transition: transform var(--selection-motion) cubic-bezier(0.22, 1.15, 0.36, 1), background-color 180ms ease;\n}\n\n.ds-seg[data-motion=\"instant\"] { --selection-motion: 0ms; }\n\n.ds-seg button {\n    min-width: 72px;\n    min-height: var(--touch-target, 44px);\n    padding: 6px 12px;\n    color: var(--text-subtle, #3D6159);\n    background: transparent;\n    border-radius: var(--radius-pill, 999px);\n    font-family: \"IRANSansX\", sans-serif;\n    font-size: 12px;\n    font-weight: 700;\n    transition: color var(--motion-fast, 150ms) ease, background var(--motion-fast, 150ms) ease, transform var(--motion-fast, 150ms) var(--ease-brand, cubic-bezier(0.32, 0.72, 0, 1));\n}\n\n.ds-seg button:hover { color: var(--text, #0D3B32); }\n.ds-seg button.ds-active { color: var(--on-action, #FFFFFF); background: transparent; }\n.ds-seg button:active { transform: scale(0.96); }\n\n\n\n.ds-seg button {border:0;} .ds-seg[data-value=\"auto\"] {--selection-x:100%;} .ds-seg[data-value=\"rtl\"] {--selection-x:200%;} .ds-seg button:focus-visible {outline:2px solid var(--accent, #2A7360);outline-offset:3px;} @media(prefers-reduced-motion:reduce){.ds-seg::before,.ds-seg button{transition:none;}} @media(forced-colors:active){.ds-seg{border:1px solid CanvasText}.ds-seg::before{background:Highlight;forced-color-adjust:none}.ds-seg button.ds-active{color:HighlightText;forced-color-adjust:none}}"
+    },
+    {
+      "name": "Reading Switch",
+      "kind": "custom",
+      "refersTo": "reading-switch",
+      "description": "Native checked preference switch in the popup RTL direction.",
+      "html": "<div dir=\"rtl\"><label class=\"ds-switch\"><input type=\"checkbox\" checked aria-label=\"فونت فارسی ایران‌سنس\"><span class=\"ds-slider\" aria-hidden=\"true\"></span></label></div>",
+      "css": ".ds-switch { --switch-motion: 360ms; position: relative; display: inline-block; flex: 0 0 auto; width: 64px; height: var(--touch-target, 44px); }\n.ds-switch[data-motion=\"instant\"] { --switch-motion: 0ms; }\n.ds-switch input { position: absolute; width: 1px; height: 1px; min-height: 0; margin: -1px; padding: 0; opacity: 0; border: 0; }\n.ds-slider {\n    position: absolute;\n    --switch-x: 0px;\n    --switch-direction: 1;\n    inset: 4px 0;\n    cursor: pointer;\n    background: var(--surface-2, #DFF7EE);\n    border: 1px solid var(--border-strong, #7A948E);\n    border-radius: 999px;\n    transition: background-color 180ms ease, border-color 180ms ease;\n}\n.ds-slider::before, .ds-slider::after {\n    content: \"\";\n    position: absolute;\n    top: 3px;\n    inset-inline-start: 3px;\n    width: 28px;\n    height: 28px;\n    background: var(--text-muted, #3D6159);\n    border-radius: 50%;\n    transform: translateX(calc(var(--switch-direction) * var(--switch-x)));\n    transition: transform var(--switch-motion) cubic-bezier(0.22, 1.15, 0.36, 1), background-color 180ms ease;\n}\n.ds-slider::after {\n    top: 10px;\n    inset-inline-start: 10px;\n    width: 14px;\n    height: 14px;\n    background: var(--surface-2, #DFF7EE);\n    transform: translateX(calc(var(--switch-direction) * var(--switch-x))) scale(0);\n}\n.ds-switch input:checked + .ds-slider { --switch-x: 28px; background: var(--brand, #5FBFA0); border-color: var(--on-feature-active, #0D3B32); }\n.ds-switch input:checked + .ds-slider::before { background: var(--on-feature-active, #0D3B32); }\n.ds-switch input:checked + .ds-slider::after { background: var(--brand, #5FBFA0); transform: translateX(calc(var(--switch-direction) * var(--switch-x))) scale(1); }\n.ds-switch:active input:not(:disabled) + .ds-slider::before { transform: translateX(calc(var(--switch-direction) * var(--switch-x))) scaleX(1.08) scaleY(0.94); }\n.ds-switch input:disabled + .ds-slider { cursor: not-allowed; opacity: 0.6; }\n.ds-switch input:focus-visible + .ds-slider { outline: 2px solid var(--accent, #2A7360); outline-offset: 3px; }\n[dir=\"rtl\"] .ds-slider { --switch-direction: -1; }\n@media (prefers-reduced-motion: reduce) {\n    .ds-switch { --switch-motion: 0ms; }\n    .ds-seg { --selection-motion: 0ms; }\n    .ds-slider::before, .ds-slider::after, .ds-seg::before { transition: none; }\n}\n@media (forced-colors: active) {\n    .ds-slider { background: Canvas; border-color: ButtonText; }\n    .ds-slider::before { background: ButtonText; }\n    .ds-slider::after { background: Canvas; }\n    .ds-switch input:checked + .ds-slider { background: Canvas; border-color: ButtonText; }\n    .ds-switch input:checked + .ds-slider::before { background: Highlight; }\n    .ds-switch input:checked + .ds-slider::after { background: Canvas; }\n    .ds-seg::before { background: Highlight; }\n    .ds-seg button.ds-active { color: HighlightText; }\n}\n\n"
+    },
+    {
+      "name": "Popup Theme Switch",
+      "kind": "custom",
+      "refersTo": "theme-switch",
+      "description": "Exact source sun/moon artwork and state CSS; affects popup appearance.",
+      "html": "<div class=\"ds-theme-switcher\"><button class=\"ds-theme-toggle\" type=\"button\" role=\"switch\" aria-checked=\"false\" aria-label=\"نمای تیرهٔ افزونه\" title=\"نمای تیرهٔ افزونه\">\n          <span class=\"ds-theme-toggle-thumb\" aria-hidden=\"true\">\n            <svg viewBox=\"0 0 24 24\" fill=\"none\">\n              <defs><mask id=\"ds-theme-moon-mask\"><rect width=\"24\" height=\"24\" fill=\"white\"/><circle class=\"ds-theme-moon-cutout\" cx=\"16\" cy=\"9\" r=\"7\" fill=\"black\"/></mask></defs>\n              <circle class=\"ds-theme-sun-disc\" cx=\"12\" cy=\"12\" r=\"7\" fill=\"currentColor\" mask=\"url(#ds-theme-moon-mask)\"/>\n              <g class=\"ds-theme-sun-rays\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M12 1v2M12 21v2M1 12h2M21 12h2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42\"/></g>\n            </svg>\n          </span>\n        </button></div>",
+      "css": ".ds-theme-switcher {\n    --theme-motion: 380ms;\n    --theme-ease: cubic-bezier(0.65, 0, 0.35, 1);\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    flex: 0 0 auto;\n}\n.ds-theme-manual-control { display: flex; align-items: center; gap: 10px; }\n.ds-theme-toggle {\n    position: relative;\n    width: 100px;\n    height: 52px;\n    flex: 0 0 100px;\n    padding: 0;\n    direction: ltr;\n    border: 2px solid var(--border-strong, #7A948E);\n    border-radius: var(--radius-pill, 999px);\n    background: var(--surface, #FFFFFF);\n    color: var(--text, #0D3B32);\n    touch-action: manipulation;\n    transition: background-color var(--theme-motion) ease, border-color 150ms ease;\n}\n.ds-theme-toggle:hover { border-color: var(--accent, #2A7360); }\n.ds-theme-toggle:active { transform: none; }\n.ds-theme-toggle-thumb {\n    position: absolute;\n    inset: 2px auto auto 2px;\n    display: grid;\n    place-items: center;\n    width: 44px;\n    height: 44px;\n    border-radius: 50%;\n    background: var(--surface-3, #B5E8D6);\n    color: var(--text, #0D3B32);\n    pointer-events: none;\n    transform: translateX(0);\n    transition: transform var(--theme-motion) var(--theme-ease), background-color var(--theme-motion) ease, color var(--theme-motion) ease;\n}\n.ds-theme-toggle[aria-checked=\"true\"] .ds-theme-toggle-thumb { transform: translateX(48px); }\n.ds-theme-toggle-thumb svg { width: 26px; height: 26px; overflow: visible; }\n.ds-theme-sun-rays { transform-origin: 12px 12px; transition: transform var(--theme-motion) var(--theme-ease), opacity 180ms ease; }\n.ds-theme-moon-cutout { transform: translate(12px, -12px); transition: transform var(--theme-motion) var(--theme-ease); }\n.ds-theme-toggle[aria-checked=\"true\"] .ds-theme-sun-rays { transform: rotate(90deg) scale(0.5); opacity: 0; }\n.ds-theme-toggle[aria-checked=\"true\"] .ds-theme-moon-cutout { transform: translate(0, 0); }\n.ds-theme-mode-caption { min-width: 32px; color: var(--text-muted, #3D6159); font-size: 12px; text-align: start; }\n.ds-theme-dark-caption, [data-mode=\"dark\"] .ds-theme-light-caption { display: none; }\n[data-mode=\"dark\"] .ds-theme-dark-caption { display: inline; }\n.ds-theme-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }\n.ds-theme-switcher[data-motion=\"instant\"] { --theme-motion: 0ms; }\n.ds-theme-switcher[data-motion=\"instant\"] .ds-theme-sun-rays { transition: none; }\n@media (prefers-reduced-motion: reduce) {\n    .ds-theme-switcher { --theme-motion: 0ms; }\n    .ds-theme-toggle-thumb, .ds-theme-moon-cutout, .ds-theme-sun-rays { transition: none; }\n}\n@media (forced-colors: active) {\n    .ds-theme-toggle { border-color: ButtonText; background: Canvas; }\n    .ds-theme-toggle-thumb { background: Highlight; color: HighlightText; forced-color-adjust: none; }\n}\n\n\n\n.ds-theme-toggle:focus-visible{outline:2px solid var(--accent, #2A7360);outline-offset:3px;}"
+    },
+    {
+      "name": "Settings Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Opaque source panel with compact popup padding.",
+      "html": "<section class=\"ds-panel\" dir=\"rtl\"><h3 class=\"ds-heading\">پاسخ‌های هوش مصنوعی</h3></section>",
+      "css": ".ds-panel{background:var(--surface,#FFFFFF);color:var(--text,#0D3B32);border-radius:var(--radius-lg,28px);padding:12px 18px;box-shadow:var(--card-shadow,0 16px 36px -26px rgba(13,59,50,.28));font-family:IRANSansX,sans-serif}.ds-heading{margin:0;color:var(--text,#0D3B32);font-size:13px;font-weight:700;line-height:1.55}@media(max-width:389px){.ds-panel{padding-inline:14px}}@media(forced-colors:active){.ds-panel{border:1px solid CanvasText;box-shadow:none}}"
+    },
+    {
+      "name": "Retry Action",
+      "kind": "button",
+      "refersTo": "retry-button",
+      "description": "Failure recovery using normal text for approved contrast.",
+      "html": "<button class=\"ds-retry\">تلاش دوباره</button>",
+      "css": ".ds-retry{min-height:44px;padding:4px 8px;color:var(--text,#0D3B32);background:var(--danger-soft,#F6DCD0);border:0;border-radius:var(--radius-sm,12px);font:400 11px/1.8 IRANSansX,sans-serif;cursor:pointer}.ds-retry:focus-visible{outline:2px solid var(--accent, #2A7360);outline-offset:3px;}.ds-retry:disabled{opacity:.55;cursor:wait}"
+    },
+    {
+      "name": "Community Action",
+      "kind": "button",
+      "refersTo": "community-button",
+      "description": "Existing footer action with source inline Telegram artwork.",
+      "html": "<button class=\"ds-community\" dir=\"rtl\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 3-4 18-6-6-4 3 1-6L3 10 21 3Z\"/><path d=\"m8 12 9-6-6 9\"/></svg><span>تلگرام GptGate</span></button>",
+      "css": ".ds-community{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0;color:var(--text-muted,#3D6159);background:transparent;border:0;font:400 11px/1.8 IRANSansX,sans-serif;cursor:pointer;transition:color 150ms ease,transform 150ms cubic-bezier(.32,.72,0,1)}.ds-community:active{transform:scale(.98)}.ds-community:focus-visible{outline:2px solid var(--accent, #2A7360);outline-offset:3px;}@media(hover:hover) and (pointer:fine){.ds-community:hover{color:var(--accent,#2A7360)}}@media(prefers-reduced-motion:reduce){.ds-community{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Windows controls for Persian reading",
+    "overview": "The GptGate Persian tool popup uses the established Windows settings controls, mint/deep-green semantic palette, solid rounded panels, IRANSansX files, and source motion curves. The result is a compact utility for Persian speakers working with mixed Persian, English, and mathematical text. The source-defined visual world is preserved rather than expanded into a dashboard.\n\nThe implementation at gptgateorg/ai-rtl-tool, baseline 244006e, is authoritative for this document. The frozen Windows reference is tests/fixtures/windows-settings.css; its upstream location is ../gptgate-window/browser-v2/src/renderer/settings/popup.css. Popup composition and three direction choices are purposeful adaptations. Product scope and validation limits remain in PRODUCT.md, docs/popup-brief.md, and docs/popup-validation.md.",
+    "keyCharacteristics": [
+      "Windows switch, sun/moon artwork, capsule shape, and motion retained.",
+      "Two opaque settings panels with compact Persian labels.",
+      "Three equal direction options with stable physical ordering.",
+      "Immediate keyboard/restored state and reduced-motion fallback."
+    ],
+    "rules": [
+      {
+        "name": "The Source Controls Rule",
+        "body": "Preserve Windows control geometry and curves; adapt the popup composition around them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Solid Panels Rule",
+        "body": "Use opaque themed panels and soft source shadows; do not add translucent dashboard treatments.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do reuse the frozen Windows reference for control geometry, tokens, SVG artwork, and motion.",
+      "Do preserve the three equal direction columns and their left/automatic/right physical order.",
+      "Do keep the popup theme separate from the existing Claude-only page preference.",
+      "Do show the effective forced-RTL math state while preserving the stored choice for automatic/LTR modes.",
+      "Do keep error and retry text on the theme text token, with the soft danger background reserved for the retry control.",
+      "Do preserve native control semantics, visible focus, reduced motion, forced colors, and truthful save feedback."
+    ],
+    "donts": [
+      "Don't introduce accounts, login, subscriptions, connection artwork, or account dashboards into this tool.",
+      "Don't redesign supported websites, change existing preference keys, or add a UI runtime for this popup.",
+      "Don't load unused font weights or add animation loops, timers, or layout measurements for control motion.",
+      "Don't treat isolated fixture evidence as proof of current live-site compatibility or Windows hardware testing."
+    ]
+  }
+}

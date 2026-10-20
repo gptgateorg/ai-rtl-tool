@@ -1,10 +1,15 @@
 (async () => {
   try {
+    if (window.__gptgate_chatgpt_engine) return;
+    const { syncExportUI, EXPORT_HEADER_SELECTOR } = await import(chrome.runtime.getURL('src/chatgpt/pdf-export.js'));
+    const { MESSAGE_SELECTOR } = await import(chrome.runtime.getURL('src/shared/export-content.js'));
     const selectors = await import(chrome.runtime.getURL('src/chatgpt/selectors.js'));
-    const { SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS } = selectors;
+    const { SELECTORS, SIDEBAR_SELECTORS, SIDEBAR_TITLE_SELECTOR, HOME_SUGGESTION_TEXT_SELECTOR, PANEL_RIGHT, disableDirectionCSS } = selectors;
     const core = await import(chrome.runtime.getURL('src/shared/core.js'));
     const { detectComposerDirection, detectTextDirection } = await import(chrome.runtime.getURL('src/shared/constants.js'));
     core.initExtension({ SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT, disableDirectionCSS });
+
+    window.__gptgate_chatgpt_engine = true;
 
     /* ── ChatGPT RTL Engine ── */
 
@@ -125,6 +130,8 @@
     function walkAndFix(root) {
       if (!root || !root.querySelectorAll) return;
 
+      if (root.matches('[data-user-message-bubble]')) processElement(root);
+
       // Process all text-level elements inside the root
       const textEls = root.querySelectorAll(
         'p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, figcaption, summary, dt, dd'
@@ -148,13 +155,10 @@
     }
 
     // ── Find ChatGPT response containers and process them ──
+    const RESPONSE_SELECTOR = `.markdown, .prose, ${MESSAGE_SELECTOR}`;
     function scanResponses() {
-      // ChatGPT response containers
-      const containers = document.querySelectorAll(
-        '.markdown, .prose, [data-message-author-role="assistant"], [data-message-author-role="user"]'
-      );
-      for (const container of containers) {
-        walkAndFix(container);
+      for (const container of document.querySelectorAll(RESPONSE_SELECTOR)) {
+        if (!container.parentElement?.closest(RESPONSE_SELECTOR)) walkAndFix(container);
       }
     }
 
@@ -217,11 +221,12 @@
       block.setAttribute('dir', useRtl ? 'rtl' : 'ltr');
     }
 
-    function fixCodeBlocks() {
+    function fixCodeBlocks(root = document) {
       injectCodeBlockStyles();
 
       const blocks = new Set();
-      document.querySelectorAll('#code-block-viewer, .cm-editor, pre.cm-content, pre code, .markdown pre').forEach((el) => {
+      if (root.matches?.('#code-block-viewer, .cm-editor, pre')) blocks.add(getCodeBlockContainer(root));
+      root.querySelectorAll('#code-block-viewer, .cm-editor, pre.cm-content, pre code, .markdown pre').forEach((el) => {
         blocks.add(getCodeBlockContainer(el));
       });
 
@@ -331,35 +336,70 @@
 
     // ── MutationObserver for dynamic content ──
     let flushScheduled = false;
+    let exportSyncNeeded = false;
+    let composersNeeded = false;
+    const dirtyResponses = new Set();
+    const dirtyCode = new Set();
+    const COMPOSER_SELECTOR = '[contenteditable="true"], textarea';
     const raf = window.requestAnimationFrame
       ? window.requestAnimationFrame.bind(window)
       : (cb) => setTimeout(cb, 16);
+
+    function queueContent(node, discover = false) {
+      const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+      if (!el || !document.body?.contains(el) || el.closest('gptgate-export-tools, #gptgate-floating-panel')) return;
+      // A streamed token only dirties its message, never the previous conversation.
+      const response = el.closest(MESSAGE_SELECTOR) || el.closest(RESPONSE_SELECTOR);
+      if (response) dirtyResponses.add(response);
+      else if (discover) for (const root of el.querySelectorAll(RESPONSE_SELECTOR)) {
+        if (!root.parentElement?.closest(RESPONSE_SELECTOR)) dirtyResponses.add(root);
+      }
+      if (el.closest(COMPOSER_SELECTOR) || (discover && el.querySelector(COMPOSER_SELECTOR))) composersNeeded = true;
+      const code = el.closest('#code-block-viewer, .cm-editor, pre');
+      if (code) dirtyCode.add(code);
+      else if (discover && !response && el.querySelector('#code-block-viewer, .cm-editor, pre')) dirtyCode.add(el);
+    }
 
     function scheduleFlush() {
       if (flushScheduled) return;
       flushScheduled = true;
       raf(() => {
         flushScheduled = false;
-        scanResponses();
-        findAndFixComposers();
-        fixCodeBlocks();
+        if (exportSyncNeeded) { exportSyncNeeded = false; syncExportUI(); }
+        for (const root of dirtyResponses) {
+          if (!root.isConnected) continue;
+          walkAndFix(root);
+          fixCodeBlocks(root);
+        }
+        dirtyResponses.clear();
+        for (const root of dirtyCode) if (root.isConnected) fixCodeBlocks(root);
+        dirtyCode.clear();
+        if (composersNeeded) { composersNeeded = false; findAndFixComposers(); }
       });
     }
 
-    // Watch for new content being added
     const contentObserver = new MutationObserver((mutations) => {
-      let shouldFlush = false;
       for (const m of mutations) {
-        if (m.type === 'characterData') {
-          shouldFlush = true;
-          break;
-        }
-        if (m.addedNodes.length > 0) {
-          shouldFlush = true;
-          break;
+        if (m.target.nodeType === Node.ELEMENT_NODE && m.target.closest('gptgate-export-tools, #gptgate-floating-panel')) continue;
+        if (m.type === 'attributes') {
+          exportSyncNeeded = true;
+          queueContent(m.target, true);
+        } else if (m.type === 'characterData') {
+          queueContent(m.target);
+        } else {
+          if ([...m.removedNodes].some(node => node.nodeType === Node.ELEMENT_NODE &&
+            (node.localName === 'gptgate-export-tools' || node.querySelector('gptgate-export-tools')))) exportSyncNeeded = true;
+          const changed = [...m.addedNodes, ...m.removedNodes].filter(node =>
+            node.nodeType === Node.TEXT_NODE || (node.nodeType === Node.ELEMENT_NODE && node.localName !== 'gptgate-export-tools'));
+          if (!changed.length) continue;
+          queueContent(m.target);
+          for (const node of m.addedNodes) if (node.nodeType === Node.ELEMENT_NODE) queueContent(node, true);
+          // Only changes to message structure need to rediscover PDF controls.
+          if (changed.some(node => node.nodeType === Node.ELEMENT_NODE &&
+            (node.matches(`${MESSAGE_SELECTOR}, main, ${EXPORT_HEADER_SELECTOR}`) || node.querySelector(`${MESSAGE_SELECTOR}, ${EXPORT_HEADER_SELECTOR}`)))) exportSyncNeeded = true;
         }
       }
-      if (shouldFlush) scheduleFlush();
+      if (dirtyResponses.size || dirtyCode.size || composersNeeded || exportSyncNeeded) scheduleFlush();
     });
 
     // Watch for body class changes (when user changes mode via popup)
@@ -380,6 +420,15 @@
       const style = document.createElement('style');
       style.id = 'chatgpt-rtl-engine-style';
       style.textContent = `
+        /* Align title text only; preserve the sidebar, row controls and native marquee. */
+        ${SIDEBAR_TITLE_SELECTOR}{flex:1;min-width:0;text-align:right}
+        ${SIDEBAR_TITLE_SELECTOR} > span{display:flex;justify-content:safe flex-end}
+        ${SIDEBAR_TITLE_SELECTOR} > span > span{flex-shrink:0}
+        ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content]{unicode-bidi:plaintext}
+        /* Native bdi wrappers hide an English prefix from dir=auto's first-strong detection. */
+        ${SIDEBAR_TITLE_SELECTOR} [data-marquee-content] :is([dir="auto"],bdi){unicode-bidi:normal;direction:inherit}
+        /* Home reminders can be button text or rich text over a separate native button. */
+        ${HOME_SUGGESTION_TEXT_SELECTOR}{text-align:right;unicode-bidi:plaintext}
         /* ChatGPT RTL Engine Styles */
         .claude-arabic-rtl {
           direction: rtl !important;
@@ -458,10 +507,12 @@
       injectStyles();
 
       // Observe the whole body for content changes
-      contentObserver.observe(document.body, {
+      contentObserver.observe(document.documentElement, {
         childList: true,
         subtree: true,
-        characterData: true
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['data-message-author-role','data-markdown-text-style','data-user-message-bubble','hidden','aria-hidden','inert']
       });
 
       // Observe body class changes (popup mode switching)
@@ -470,8 +521,20 @@
         attributeFilter: ['class']
       });
 
+      // Rebind only when hydration replaces body, not on streamed text updates.
+      let observedBody = document.body;
+      const bodyObserver = new MutationObserver(() => {
+        if (document.body === observedBody || !document.body) return;
+        observedBody = document.body;
+        classObserver.disconnect();
+        classObserver.observe(observedBody, {attributes:true, attributeFilter:['class']});
+        run();
+      });
+      bodyObserver.observe(document.documentElement, {childList:true});
+
       // Initial scan
       const run = () => {
+        syncExportUI();
         scanAll();
         findAndFixComposers();
         fixCodeBlocks();
@@ -483,18 +546,13 @@
         setTimeout(run, 400);
       }
 
-      // Periodic composer check (ChatGPT can recreate the textarea)
-      setInterval(() => {
-        findAndFixComposers();
-        fixCodeBlocks();
-      }, 1500);
-
       // Also scan when navigating between conversations
       let lastUrl = location.href;
       setInterval(() => {
         if (location.href !== lastUrl) {
           lastUrl = location.href;
           setTimeout(() => {
+            syncExportUI();
             scanAll();
             findAndFixComposers();
             fixCodeBlocks();

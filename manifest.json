@@ -1,14 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "GptGate",
-  "version": "0.1.1",
-  "description": "Toggle RTL for responses/composer and enforce LTR for math (KaTeX/MathJax) on ChatGPT, Gemini, and Claude.",
+  "name": "__MSG_extensionName__",
+  "version": "0.1.2",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "images/logo.png",
     "48": "images/logo.png",
     "128": "images/logo.png"
   },
-  "permissions": ["storage", "tabs", "scripting"],
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
   "host_permissions": [
     "https://chat.openai.com/*",
     "https://chatgpt.com/*",
@@ -21,21 +24,27 @@
         "https://chat.openai.com/*",
         "https://chatgpt.com/*"
       ],
-      "js": ["src/chatgpt/content.js"],
+      "js": [
+        "src/chatgpt/content.js"
+      ],
       "run_at": "document_start"
     },
     {
       "matches": [
         "https://gemini.google.com/*"
       ],
-      "js": ["src/gemini/content.js"],
+      "js": [
+        "src/gemini/content.js"
+      ],
       "run_at": "document_start"
     },
     {
       "matches": [
         "https://claude.ai/*"
       ],
-      "js": ["src/claude/content.js"],
+      "js": [
+        "src/claude/content.js"
+      ],
       "run_at": "document_start"
     }
   ],
@@ -64,7 +73,13 @@
         "src/claude/selectors.js",
         "images/logo.png",
         "images/floating-logo.png",
-        "fonts/*"
+        "fonts/*",
+        "src/shared/fonts.js",
+        "src/shared/export-content.js",
+        "src/chatgpt/pdf-export.js",
+        "fonts/licenses/*",
+        "images/brand-mark.svg",
+        "src/shared/tips.js"
       ],
       "matches": [
         "https://chat.openai.com/*",
@@ -73,5 +88,6 @@
         "https://claude.ai/*"
       ]
     }
-  ]
+  ],
+  "default_locale": "fa"
 }

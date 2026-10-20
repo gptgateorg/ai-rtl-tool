@@ -1,4 +1,6 @@
 (async () => {
+  if (window.__gptgate_gemini_engine_loaded) return;
+  window.__gptgate_gemini_engine_loaded = true;
   try {
     const { SELECTORS, SIDEBAR_SELECTORS, PANEL_RIGHT } = await import(chrome.runtime.getURL('src/gemini/selectors.js'));
     const core = await import(chrome.runtime.getURL('src/shared/core.js'));
@@ -15,6 +17,20 @@
       const style = document.createElement('style');
       style.id = CODE_BLOCK_STYLE_ID;
       style.textContent = `
+        body.gptgate-platform-gemini.gptgate-rtl-composer [contenteditable="true"] p,
+        body.gptgate-platform-gemini.gptgate-rtl-composer [contenteditable="true"] div {
+          direction: rtl !important; text-align: right !important;
+        }
+        body.gptgate-platform-gemini.gptgate-ltr-composer [contenteditable="true"] p,
+        body.gptgate-platform-gemini.gptgate-ltr-composer [contenteditable="true"] div {
+          direction: ltr !important; text-align: left !important;
+        }
+        /* Let each auto paragraph resolve its first strong character without
+           touching attributes owned by the native editor. */
+        body.gptgate-platform-gemini:not(.gptgate-rtl-composer):not(.gptgate-ltr-composer) [contenteditable="true"] p,
+        body.gptgate-platform-gemini:not(.gptgate-rtl-composer):not(.gptgate-ltr-composer) [contenteditable="true"] div {
+          direction: inherit !important; unicode-bidi: plaintext !important; text-align: start !important;
+        }
         body.gptgate-platform-gemini .gptgate-gemini-rtl {
           direction: rtl !important;
           text-align: right !important;
@@ -75,23 +91,21 @@
 
     function applyDirection(el, dir) {
       if (!el) return;
-
-      el.classList.remove('gptgate-gemini-rtl', 'gptgate-gemini-ltr');
-      if (dir === 'rtl') {
-        el.setAttribute('dir', 'rtl');
-        el.classList.add('gptgate-gemini-rtl');
-        el.style.setProperty('direction', 'rtl', 'important');
-        el.style.setProperty('text-align', 'right', 'important');
-      } else if (dir === 'ltr') {
-        el.setAttribute('dir', 'ltr');
-        el.classList.add('gptgate-gemini-ltr');
-        el.style.setProperty('direction', 'ltr', 'important');
-        el.style.setProperty('text-align', 'left', 'important');
-      } else {
-        el.setAttribute('dir', 'auto');
-        el.style.removeProperty('direction');
-        el.style.removeProperty('text-align');
+      const attr = dir || 'auto';
+      if (el.getAttribute('dir') !== attr) el.setAttribute('dir', attr);
+      for (const value of ['rtl', 'ltr']) {
+        const name = `gptgate-gemini-${value}`;
+        if (el.classList.contains(name) !== (dir === value)) el.classList.toggle(name, dir === value);
       }
+      for (const [name, value] of [['direction', dir], ['text-align', dir === 'rtl' ? 'right' : dir === 'ltr' ? 'left' : null]]) {
+        if (value) {
+          if (el.style.getPropertyValue(name) !== value || el.style.getPropertyPriority(name) !== 'important') el.style.setProperty(name, value, 'important');
+        } else if (el.style.getPropertyValue(name)) el.style.removeProperty(name);
+      }
+    }
+
+    function within(root, selector) {
+      return [...(root.matches?.(selector) ? [root] : []), ...root.querySelectorAll(selector)];
     }
 
     function isResponseTextCandidate(el) {
@@ -103,7 +117,7 @@
       return (el.textContent || '').trim().length > 0;
     }
 
-    function getResponseTextElements() {
+    function getResponseTextElements(root) {
       const selectors = [
         'message-content .markdown-main-panel',
         'message-content .markdown',
@@ -127,13 +141,13 @@
         'user-query-content .query-text-line',
       ];
 
-      return Array.from(document.querySelectorAll(selectors.join(', ')))
+      return within(root, selectors.join(', '))
         .filter(isResponseTextCandidate);
     }
 
-    function fixResponses() {
+    function fixResponses(root = document) {
       const mode = getResponseMode();
-      const roots = document.querySelectorAll('message-content .markdown, message-content .markdown-main-panel, user-query .query-text');
+      const roots = within(root, 'message-content .markdown, message-content .markdown-main-panel, user-query .query-text');
 
       roots.forEach((root) => {
         if (!isResponseTextCandidate(root)) return;
@@ -141,7 +155,7 @@
         applyDirection(root, dir);
       });
 
-      getResponseTextElements().forEach((el) => {
+      getResponseTextElements(root).forEach((el) => {
         const dir = resolveDir(el.textContent || '', mode, mode === 'auto' ? null : mode);
         applyDirection(el, dir);
       });
@@ -166,16 +180,17 @@
 
       const useRtl = shouldUseRtlForCodeBlock(block.textContent || '');
 
-      block.classList.toggle('gptgate-rtl-code-block', useRtl);
-      block.dataset.gptgateCodeDir = useRtl ? 'rtl' : 'ltr';
-      block.setAttribute('dir', useRtl ? 'rtl' : 'ltr');
+      if (block.classList.contains('gptgate-rtl-code-block') !== useRtl) block.classList.toggle('gptgate-rtl-code-block', useRtl);
+      const dir = useRtl ? 'rtl' : 'ltr';
+      if (block.dataset.gptgateCodeDir !== dir) block.dataset.gptgateCodeDir = dir;
+      if (block.getAttribute('dir') !== dir) block.setAttribute('dir', dir);
     }
 
-    function fixCodeBlocks() {
+    function fixCodeBlocks(root = document) {
       injectCodeBlockStyles();
 
       const blocks = new Set();
-      document.querySelectorAll('#code-block-viewer, .cm-editor, code-block, .code-block, pre.cm-content, pre code').forEach((el) => {
+      within(root, '#code-block-viewer, .cm-editor, code-block, .code-block, pre.cm-content, pre code').forEach((el) => {
         blocks.add(getCodeBlockContainer(el));
       });
 
@@ -209,29 +224,21 @@
         applyDirection(editor, null);
       }
 
-      if (editor.tagName !== 'TEXTAREA') {
-        editor.querySelectorAll('p, div:not(.ql-clipboard)').forEach((block) => {
-          if (block.classList?.contains('ql-clipboard')) return;
-          const blockText = block.textContent || '';
-          const blockDir = mode === 'auto'
-            ? resolveDir(blockText, mode, dir)
-            : dir;
-          applyDirection(block, blockDir);
-        });
-      }
+      // The native editor owns its child nodes. Direction is inherited through
+      // scoped CSS instead of rewriting editor paragraphs after every keystroke.
     }
 
-    function fixComposers() {
-      const editors = document.querySelectorAll(SELECTORS.composer.join(', '));
+    const boundEditors = new WeakSet();
+    function fixComposers(root = document) {
+      const editors = within(root, SELECTORS.composer.join(', '));
       for (const ed of editors) {
         if (ed.classList?.contains('ql-clipboard')) continue;
         if (ed.tagName !== 'RICH-TEXTAREA' && ed.tagName !== 'TEXTAREA' && !ed.closest('rich-textarea, input-area-v2')) continue;
 
-        if (!ed.dataset.gptgateInit) {
-          ed.dataset.gptgateInit = '1';
+        if (!boundEditors.has(ed)) {
+          boundEditors.add(ed);
           ed.addEventListener('input', () => fixComposer(ed));
           ed.addEventListener('compositionend', () => fixComposer(ed));
-          ed.addEventListener('keyup', () => fixComposer(ed));
         }
         fixComposer(ed);
       }
@@ -243,32 +250,52 @@
         return;
       }
 
-      const runFixes = () => {
-        fixResponses();
-        fixComposers();
-        fixCodeBlocks();
+      const runFixes = (root = document) => {
+        fixResponses(root);
+        fixComposers(root);
+        fixCodeBlocks(root);
       };
-
-      // Run periodically to catch newly added editors and code viewers.
-      setInterval(runFixes, 1500);
-
-      const observer = new MutationObserver((mutations) => {
-        let shouldRun = false;
-        for (const m of mutations) {
-          if (m.type === 'characterData' || m.addedNodes.length > 0) {
-            shouldRun = true;
-            break;
+      const pending = new Set();
+      let scheduled = false;
+      let mode = '';
+      let all = false;
+      const schedule = () => {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+          scheduled = false;
+          if (all) runFixes();
+          else {
+            const roots = [...pending].filter(root => root.isConnected);
+            for (const root of roots) if (!roots.some(other => other !== root && other.contains(root))) runFixes(root);
           }
+          pending.clear(); all = false;
+        });
+      };
+      const responseRoot = 'message-content, user-query, user-query-content, model-response';
+      const composerRoot = 'rich-textarea, textarea, [contenteditable="true"]';
+      const queue = (node, added = false) => {
+        const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+        if (!el) return;
+        const root = el.closest('#code-block-viewer, .cm-editor, code-block, .code-block, pre') || el.closest(composerRoot) || el.closest(responseRoot);
+        if (root) pending.add(root);
+        else if (added) pending.add(el);
+      };
+      const observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+          queue(m.target);
+          for (const node of m.addedNodes) queue(node, true);
         }
-        if (shouldRun) runFixes();
+        if (pending.size) schedule();
       });
       observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-
-      const classObserver = new MutationObserver(runFixes);
-      classObserver.observe(document.body, {
-        attributes: true,
-        attributeFilter: ['class']
+      const classObserver = new MutationObserver(() => {
+        const next = `${getResponseMode()}:${getComposerMode()}`;
+        if (mode === next) return;
+        mode = next; all = true; schedule();
       });
+      classObserver.observe(document.body, {attributes:true, attributeFilter:['class']});
+      mode = `${getResponseMode()}:${getComposerMode()}`;
 
       runFixes();
     }
