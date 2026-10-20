@@ -61,7 +61,9 @@ export function initExtension(platformSelectors) {
     if (typeof chrome !== 'undefined' && chrome?.runtime?.connect) {
       const port = chrome.runtime.connect({ name: 'gptgate-context' });
       port.onDisconnect.addListener(() => {
-        handleInvalidation();
+        // A missing/suspended worker can disconnect a still-valid content script.
+        void chrome.runtime.lastError;
+        if (isContextInvalidated()) handleInvalidation();
       });
     }
   } catch (err) {
@@ -827,9 +829,6 @@ export function initExtension(platformSelectors) {
           (state) => {
             if (isContextInvalidated()) return;
             applyState(state || {}, 'initial');
-            if (isClaude && state && CLAUDE_DARK_SURFACE_KEY in state) {
-              setClaudeDarkSurface(state[CLAUDE_DARK_SURFACE_KEY]);
-            }
           }
         );
       }
@@ -844,7 +843,7 @@ export function initExtension(platformSelectors) {
           if (area === 'local' && CUSTOM_FONT_KEY in changes) void updateFont(currentState, true);
           if (area !== 'sync') return;
           const upd = {};
-          for (const key of ['fontFamily','fontWeight']) if (key in changes) upd[key] = changes[key].newValue;
+          for (const key of ['fontFamily','fontWeight',CLAUDE_DARK_SURFACE_KEY]) if (key in changes) upd[key] = changes[key].newValue;
           if ('responseDir' in changes) upd.responseDir = changes.responseDir.newValue;
           if ('composerDir' in changes) upd.composerDir = changes.composerDir.newValue;
           if ('mathFix' in changes) upd.mathFix = changes.mathFix.newValue;
@@ -852,9 +851,6 @@ export function initExtension(platformSelectors) {
           if ('rtlResponses' in changes) upd.rtlResponses = changes.rtlResponses.newValue;
           if ('rtlComposer' in changes) upd.rtlComposer = changes.rtlComposer.newValue;
           if (Object.keys(upd).length) applyState(upd, 'storage-change');
-          if (isClaude && CLAUDE_DARK_SURFACE_KEY in changes) {
-            setClaudeDarkSurface(changes[CLAUDE_DARK_SURFACE_KEY].newValue);
-          }
         });
       }
     } catch (err) {

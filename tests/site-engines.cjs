@@ -31,6 +31,15 @@ ${Array.from({length:40},(_,i)=>`<model-response><message-content><div class="pr
     await worker.evaluate(()=>chrome.storage.sync.set({claudeDarkSurface:true}));
     await page.waitForFunction(()=>getComputedStyle(document.body).backgroundColor==='rgb(2, 2, 2)');
     const black=await appearance();assert.equal(black.canvas,'rgb(2, 2, 2)','Nested theme root must not hide the black canvas');assert.equal(black.main,'rgb(2, 2, 2)');assert.equal(black.popover,native.popover);assert.equal(black.lightIsland,'rgb(250, 249, 245)');assert.deepEqual(black.box,native.box,'Black canvas preserves native composer surface and geometry');assert.equal(black.button,native.button,'Native buttons preserve their surface');
+    await page.bringToFront();
+    assert.equal(await page.evaluate(()=>document.hidden),false);
+    await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+    assert.equal((await appearance()).canvas,'rgb(2, 2, 2)','A storage-only theme update survives tab activation without popup broadcast');
+    await worker.evaluate(()=>chrome.storage.sync.set({fontWeight:500}));
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#editor')).fontWeight==='500');
+    assert.equal((await appearance()).canvas,'rgb(2, 2, 2)','A later synced preference must not revert the synced theme');
+    await worker.evaluate(()=>chrome.storage.sync.set({fontWeight:400}));
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#editor')).fontWeight==='400');
     await page.evaluate(()=>document.documentElement.dataset.mode='light');
     const light=await appearance();assert.equal(light.page,'rgb(250, 249, 245)','Black preference must not override native light mode');assert.equal(light.box.background,'rgb(255, 255, 255)');assert.equal(light.canvas,'rgb(250, 249, 245)');
     await page.evaluate(()=>document.documentElement.dataset.mode='dark');
@@ -41,6 +50,9 @@ ${Array.from({length:40},(_,i)=>`<model-response><message-content><div class="pr
    let world;
    for(const candidate of worlds){const result=await cdp.send('Runtime.evaluate',{contextId:candidate.id,expression:'Boolean(window.__gptgate_loaded)',returnByValue:true});if(result.result.value)world=candidate;}
    assert.ok(world,'Extension isolated world exists');
+   const doc=await cdp.send('Runtime.evaluate',{contextId:world.id,expression:'document'});
+   const {listeners}=await cdp.send('DOMDebugger.getEventListeners',{objectId:doc.result.objectId});
+   assert.ok(listeners.some(l=>l.type==='visibilitychange'),'A disconnected worker port must not remove valid page listeners');
    const evaluate=async expression=>(await cdp.send('Runtime.evaluate',{contextId:world.id,expression,returnByValue:true,awaitPromise:true})).result.value;
    await evaluate(`(()=>{window.qa={documentQueries:0,oldReads:0,editorBindings:0};const bind=EventTarget.prototype.addEventListener;EventTarget.prototype.addEventListener=function(type,...args){if(this.id==='editor'&&['input','compositionend'].includes(type))qa.editorBindings++;return bind.call(this,type,...args)};const query=Document.prototype.querySelectorAll;Document.prototype.querySelectorAll=function(...args){qa.documentQueries++;return query.apply(this,args)};const descriptor=Object.getOwnPropertyDescriptor(Node.prototype,'textContent');Object.defineProperty(Node.prototype,'textContent',{...descriptor,get(){if(this.id==='old'||this.id==='answer-0')qa.oldReads++;return descriptor.get.call(this)}});})()`);
    const metrics=async()=>Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(m=>[m.name,m.value]));
